@@ -1,0 +1,10 @@
+import math
+
+a = str(math.pi)
+
+
+b = []
+for i in a:
+    b.append(i)
+    
+print(b)
