@@ -73,7 +73,8 @@ while (flagga):
         print(f"Den geometriska summa är: {geometrisk_sum(start, kvot, antal)}")
     elif (val == 3):
         print("Hej dåå")
-        flagga = False
+        break #stoppar whileloopen
+        
     else:
         print("Något gick snett")
     
