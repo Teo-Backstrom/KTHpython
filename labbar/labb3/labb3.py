@@ -54,7 +54,7 @@ def störst(första, andra):
         
 
 def main():
-    
+
     """
     Programmet där användaren får flervalsfrågor och får mata in sitt svar
     Först en huvudmeny där använaderen får välja vad den vill göra
