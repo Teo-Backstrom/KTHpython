@@ -1,8 +1,9 @@
 
-#ett inläsningverktyg där den felhanterar felinmating, kan ställa in max och min nummer och undantag och vilken typ av värde på inmating, och välja ett sträng som skrivs ut
+def inläsning(maxInt = float("inf"), minInt = float("-inf"), typ = any, undantag = [], text = ""):
+    """ ett inläsningverktyg där den felhanterar felinmating,
+        kan ställa in max och min nummer och undantag och vilken typ av värde på inmating,
+        och välja ett sträng som skrivs ut
 
-def readtype(maxInt = float("inf"), minInt = float("-inf"), typ = any, undantag = []  ,text = ""):
-    """_summary_
 
     Args:
         maxInt (float): värde för att sätta maxgräns till inmatingsvärde. Defaultar till float("inf").
