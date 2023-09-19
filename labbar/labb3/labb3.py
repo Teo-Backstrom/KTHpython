@@ -16,18 +16,35 @@ def aritmetisk_sum(start, diff, antal):
     #aritematiska summaformel
     resultat = (antal * (start + (start + (antal - 1) * diff)))/2
     return resultat
-   # print(f"Den aritmetiska summa är: {resultat}")
 
 
 #funktion för att räkna ut den geometriska summan
 def geometrisk_sum(start, kvot, antal):
+    """funktion som räknar ut och retunerar den geometriska summan
+        med den aritemetiska summaformeln
+
+    Args:
+        start (float): startvärde av geometrisk talföljden
+        kvot (float): kvoten av geometrisk talföljden
+        antal (int): antal element i geometrisk talföljden
+
+    Returns:
+        float: summa av geometrisk talföljd
+    """
     #geometriskas summaformel
     resultat = start * (((kvot**antal) - 1) / (kvot - 1))
     return resultat
-    #
-    # print(f"Den geometriska summa är: {resultat}")
+
 
 def störst(första, andra):
+    """tar in 2 värden och kollar vilken som är stört eller om de är lika stora
+        och skriver ut resultatet
+        
+    Args:
+        första (float): första värdet
+        andra (float): andra värdet
+    """
+    
     if (första == andra):
         print("Summorna är lika")
     elif (första > andra):
@@ -40,9 +57,9 @@ def main():
     
     """
     Programmet där användaren får flervalsfrågor och får mata in sitt svar
-    Först en huvudmeny där använaderen får välja vad den vill vad den vill göra
+    Först en huvudmeny där använaderen får välja vad den vill göra
     Sedan får den mata in värderna i kalkylatorn
-    Programmet kallar på rätt funktion och skriver ut svaret
+    Programmet kallar på rätt funktion och skriver ut vilken summa som är störst eller om de är lika stora
     Användaren får slutligen fråga om den vill göra en ny beräkning eller avsluta
     """
     #flagga för att kolla om användare vill avsluta programmet
