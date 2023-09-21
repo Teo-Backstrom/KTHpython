@@ -1,3 +1,4 @@
+#importerar filen felhantering
 import felhantering
 
 #funktion för att räkna ut den aritematiska summan
@@ -80,7 +81,7 @@ def main():
             #tar emot menyval och sparar i lista 
             menyval.append(felhantering.inläsning(3, 1, int))
 
-            #kollar vilklet val som gjorts
+            #kollar vilket val som gjorts
             if (menyval[räknare] == 1):
                 #frågar och tar emot värden för aritemetisk summa
                 värden.append(felhantering.inläsning(typ = float, text = "Skriv in startvärdet (a1): "))
