@@ -3,67 +3,103 @@
 
 class Person:
     """
-    Person klass med för och lastname samt person nummer som egenskaper
+    Person klass med egenskpar som förnamn efternamn personnummer och roll,
+    Funktioner som kan ändra namn på person
     """
 
-    # sparar egenskaperna hos objektet
     def __init__(self, firstname, lastname, person_nr):
+        """
+        sparar egenskaperna hos objektet
+        """
         self.firstname = firstname
         self.lastname = lastname
         self.person_nr = person_nr
         self.roll = "None"
 
-    # bestämmer hur objektet representeras som en sträng
     def __str__(self):
+        """
+        bestämmer hur objektet representeras som en sträng
+        """
         return f"Namn: {self.firstname} {self.lastname} Personnr: {self.person_nr} Roll: {self.roll}"
 
     def rename(self):
+        """
+        Funktion som först kollar om användaren vill ändra namn om ja så ändrar den till det givna namnnet
+        """
         control_quest = ""
 
         while control_quest != ("j" or "n"):
             control_quest = input(
                 f"Vill du ändra namn på {self.firstname} {self.lastname} (j/n)?"
             ).lower()
-        if control_quest == "j":
-            firstname, lastname = nameinput(
-                text="Skriv in det nya namnet:", wordcount=2
-            )
-            self.firstname = firstname
-            self.lastname = lastname
-            print(
-                f"Nu är namnet för {self.person_nr} ändrat till {firstname} {lastname}!"
-            )
+            if control_quest == "j":
+                firstname, lastname = nameinput(
+                    text="Skriv in det nya namnet:", wordcount=2
+                )
+                self.firstname = firstname
+                self.lastname = lastname
+                print(
+                    f"Nu är namnet för {self.person_nr} ändrat till {firstname} {lastname}!"
+                )
 
-        else:
-            print("Namnnet är inte ändrat")
+            else:
+                print("Namnnet är inte ändrat")
+                break
 
 
 class Student(Person):
+    """
+    klassen student ärver från klassen Person och lägger till så rollen är Student
+    """
+
     def __init__(self, firstname, lastname, person_nr):
         super().__init__(firstname, lastname, person_nr)
         self.roll = "Student"
 
 
 class Teacher(Person):
+    """
+    klassen Teacher ärver från klassen Person och lägger till så rollen är Lärare
+    """
+
     def __init__(self, firstname, lastname, person_nr):
         super().__init__(firstname, lastname, person_nr)
         self.roll = "Lärare"
 
 
 class School:
+    """
+    Klassen School har 2 attribut där det är en var sin lista att spara student och teacher objekt i
+    Klassen har också funktioner så som att skriva ut alla personer i vald lista, Lägga till personer i en lista,
+    döpa om en person i en lista, ta bor en person i en lista, söka upp en person i en lista.
+    """
+
     def __init__(self):
+        """
+        skapar 2 tomma listor när klassen School initiserar
+        """
         self.students = []
         self.teachers = []
 
     def print_students(self):
+        """
+        Skriver ut alla studenter i listan students
+        """
         for student in self.students:
             print(student)
 
     def print_teachers(self):
+        """
+        Skriver ut alla lärare i listan teachers
+        """
         for teacher in self.teachers:
             print(teacher)
 
     def addperson(self):
+        """
+        funktion för att lägga till en person i en vald lista,
+        frågar vilken roll personen har vad den heter och dens personnummer och sparar rätt objekt i rätt lista
+        """
         print("Är personen en Lärare eller Student?")
         role = ""
         while role.lower() not in ["lärare", "student"]:
@@ -73,6 +109,7 @@ class School:
         firstname, lastname = nameinput(
             text="Vad heter personen? (firstname lastname)", wordcount=2
         )
+
         person_nr = person_nr_input()
 
         if role.lower() == "lärare":
@@ -81,28 +118,37 @@ class School:
             self.students.append(Student(firstname, lastname, person_nr))
 
     def rename_person(self):
-        person_n = person_nr_input()
+        """
+        funktion för att döpa om en person i vald lista
+        frågar vilket peronnummer personen har och söker personen i listorna,
+        tar ut personen och skickar den till rename funktionen
+        """
+        person_nr = person_nr_input()
 
         for student in self.students:
-            if person_n == student.person_nr:
+            if person_nr == student.person_nr:
                 person = student
         for teacher in self.teachers:
-            if person_n == teacher.person_nr:
+            if person_nr == teacher.person_nr:
                 person = teacher
         person.rename()
 
     def remove_person(self):
+        """
+        Funktion för att ta bort vald person
+        frågar för om personnummer och söker personen i listorna och kontrollfårgar användaren,
+        sedan så tar den bort personen
+        """
         is_teacher = False
-        person_n = person_nr_input()
+        person_nr = person_nr_input()
         person = None
         for student in self.students:
-            if person_n == student.person_nr:
+            if person_nr == student.person_nr:
                 person = student
         for teacher in self.teachers:
-            if person_n == teacher.person_nr:
+            if person_nr == teacher.person_nr:
                 person = teacher
                 is_teacher = True
-                
 
         if person == None:
             print("Ingen person hittades")
@@ -126,6 +172,11 @@ class School:
                     print("Inget har ändrats")
 
     def search_people(self):
+        """
+        funktion för att söka en person på namn,
+        frågar först vad personen heter, två loopar itterar över listorna och sparar personerna i listan people
+        Sedan så skrivs alla personer i listan ut
+        """
         people = []
         firstname, lastname = nameinput(text="Vem vill du söka efter", wordcount=2)
         for teacher in self.teachers:
@@ -146,18 +197,27 @@ class School:
 
 
 def nameinput(text="", wordcount=1):
-    name =""
+    """
+    Funktion för att ta in namn i vald format(antal mellanslag)
+    först frågar den om namn och kollar om den stämemr med kravet på mellanslag,
+    sedan så splittar den namnet vid varje mellanslag för enklare hantering
+    """
+    name = ""
     # Kollar att det är rätt antal mellanslag
     while len(name.split(" ")) != wordcount:
         name = input(text)
         if len(name.split(" ")) != wordcount:
-        # Ger konstruktiv feedback
+            # Ger konstruktiv feedback
             print(f"inmatningen måste vara uppdalad i {wordcount} del/delar")
         else:
             return name.split(" ")
 
 
 def person_nr_input():
+    """
+    kollar så att personnummret är ett gilltigt personnummer med 10 siffor,
+    kollar först om det bara är siffror sdan om den tillhör en månad och en dag i den valda månaden
+    """
     allowedinput = False
     monthday = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     while not allowedinput:
@@ -181,33 +241,12 @@ def person_nr_input():
     return person_nr
 
 
-def inläsning(typ=any, text="", ordtal=1):
-    """
-    Inläsningsverktyg som kollar att det är rätt typ och att det är rätt antal mellanslag
-
-    Returns:
-         En godkänd inmatning
-    """
-    while True:
-        # skriver ut en text och tar in värde från användaren
-        värde = input(text)
-
-        try:
-            # kollar om det är rätt typ
-            typ(värde)
-        except:
-            # Skriver ut felmedelande ifall det behövs
-            print("Personnumret får bara innehålla siffror, försök igen!")
-        else:
-            # Kollar att det är rätt antal mellanslag
-            if len(värde.split(" ")) != ordtal:
-                # Ger konstruktiv feedback
-                print(f"inmatningen måste vara uppdalad i {ordtal} del/delar")
-            else:
-                return värde
-
-
 def main():
+    """
+    funktion som kallar på alla andra funktioner,
+    börjar med att skapa en instans av School,
+    sedan så skriver den ut en meny till användaren där val leder till rätt funkiton som körs
+    """
     school = School()
 
     value = ""
@@ -231,7 +270,6 @@ def main():
             print("Hejdå")
         else:
             print("felaktig input")
-
 
 
 main()

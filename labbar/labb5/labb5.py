@@ -83,3 +83,29 @@ def main():
 
 # Kör mainfunktionen
 main()
+
+
+def inläsning(typ=any, text="", ordtal=1):
+    """
+    Inläsningsverktyg som kollar att det är rätt typ och att det är rätt antal mellanslag
+
+    Returns:
+         En godkänd inmatning
+    """
+    while True:
+        # skriver ut en text och tar in värde från användaren
+        värde = input(text)
+
+        try:
+            # kollar om det är rätt typ
+            typ(värde)
+        except:
+            # Skriver ut felmedelande ifall det behövs
+            print("Personnumret får bara innehålla siffror, försök igen!")
+        else:
+            # Kollar att det är rätt antal mellanslag
+            if len(värde.split(" ")) != ordtal:
+                # Ger konstruktiv feedback
+                print(f"inmatningen måste vara uppdalad i {ordtal} del/delar")
+            else:
+                return värde
