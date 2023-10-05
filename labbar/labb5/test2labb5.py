@@ -71,7 +71,7 @@ class School:
             if role.lower() not in ["lärare", "student"]:
                 print('Du måste ange "Lärare" eller "Student"')
         firstname, lastname = nameinput(
-            text="Vad heter studenten? (firstname lastname)", wordcount=2
+            text="Vad heter personen? (firstname lastname)", wordcount=2
         )
         person_nr = person_nr_input()
 
@@ -92,6 +92,7 @@ class School:
         person.rename()
 
     def remove_person(self):
+        is_teacher = False
         person_n = person_nr_input()
         person = None
         for student in self.students:
@@ -100,6 +101,8 @@ class School:
         for teacher in self.teachers:
             if person_n == teacher.person_nr:
                 person = teacher
+                is_teacher = True
+                
 
         if person == None:
             print("Ingen person hittades")
@@ -108,17 +111,19 @@ class School:
 
             while control_quest != ("j" or "n"):
                 control_quest = input(
-                    f"Vill du ta bort {person.firstname} {self.lastname} (j/n)?"
+                    f"Vill du ta bort {person.firstname} {person.lastname} (j/n)?"
                 ).lower()
 
                 if control_quest == "j":
-                    self.students.remove(person)
-                    self.teachers.remove(person)
+                    if is_teacher:
+                        self.teachers.remove(person)
+                    else:
+                        self.students.remove(person)
                     print(
                         f"Nu är {person.person_nr}: {person.firstname} {person.lastname} borttagen!"
                     )
-            else:
-                print("Inget har ändrats")
+                else:
+                    print("Inget har ändrats")
 
     def search_people(self):
         people = []
@@ -133,18 +138,23 @@ class School:
                 student.lastname.lower() == lastname.lower()
             ):
                 people.append(student)
-        for person in people:
-            print(person)
+        if len(people) == 0:
+            print(f"Ingen person med namnet {firstname} {lastname} kunde hittas")
+        else:
+            for person in people:
+                print(person)
 
 
 def nameinput(text="", wordcount=1):
-    name = input(text)
+    name =""
     # Kollar att det är rätt antal mellanslag
-    if len(name.split(" ")) != wordcount:
+    while len(name.split(" ")) != wordcount:
+        name = input(text)
+        if len(name.split(" ")) != wordcount:
         # Ger konstruktiv feedback
-        print(f"inmatningen måste vara uppdalad i {wordcount} del/delar")
-    else:
-        return name.split(" ")
+            print(f"inmatningen måste vara uppdalad i {wordcount} del/delar")
+        else:
+            return name.split(" ")
 
 
 def person_nr_input():
@@ -201,75 +211,27 @@ def main():
     school = School()
 
     value = ""
-    while value != "ö":
+    while value != "7":
         value = input(
-            "1. Vill du lägga till (l)\n2 Ändra (a)\n3 Ta bort (t)\n3 Söka ett objekt(s)\n4 Skriva ut alla studenter(ss)\n5 Skriva ut alla lärare(sl)\n6 Avsluta (ö) för att avsluta"
+            "1 Vill du lägga till\n2 Ändra\n3 Ta bort\n4 Söka ett objekt\n5 Skriva ut alla studenter\n6 Skriva ut alla lärare\n7 För att avsluta\n"
         )
-        if value == "l":
+        if value == "1":
             school.addperson()
-        elif value == "a":
+        elif value == "2":
             school.rename_person()
-        elif value == "t":
+        elif value == "3":
             school.remove_person()
-        elif value == "s":
+        elif value == "4":
             school.search_people()
-        elif value == "ss":
+        elif value == "5":
             school.print_students()
-        elif value == "sl":
+        elif value == "6":
             school.print_teachers()
+        elif value == "7":
+            print("Hejdå")
         else:
             print("felaktig input")
 
-    print("Hejdå")
 
 
 main()
-
-""" def main():
-    
-    #program för att ta in personerser och dess egenskapar och sedan skriva ut dem
-    
-    # lista för att spara objekten i
-
-    # Tar in 3st personer
-    for i in range(3):
-        print("Vad för roll har personen?")
-        val1 = input()
-
-        if val1 == "Lärare":
-            # tar in namn
-            namn = inläsning(
-                typ=str, text="Vad heter studenten? (firstname lastname)", ordtal=2
-            )
-            # Delar på namnen till för och lastname
-            firstname, lastname = namn.split(" ")
-            # tar in personnr
-            person_nr = inläsning(typ=int, text="Vad är studentens personnr?")
-            # sparar objektet i listan
-            School(Teacher(firstname, lastname, person_nr), val1)
-            print("\nObjektet skapat!\n")
-        else:
-            # tar in namn
-            namn = inläsning(
-                typ=str, text="Vad heter studenten? (firstname lastname)", ordtal=2
-            )
-            # Delar på namnen till för och lastname
-            firstname, lastname = namn.split(" ")
-            # tar in personnr
-            person_nr = inläsning(typ=int, text="Vad är studentens personnr?")
-            # sparar objektet i listan
-            School(Student(firstname, lastname, person_nr), val1)
-            print("\nObjektet skapat!\n")
-
-    print("Här är alla studenter på KTH:")
-    # Loppar igenom listan och skriver ut objekten och dess egenskaper
-    for i in School.students:
-        print(i)
-
-    print("\nHär är alla lärare på KTH")
-    for i in School.teachers:
-        print(i)
-
-
-# Kör mainfunktionen
-main() """
