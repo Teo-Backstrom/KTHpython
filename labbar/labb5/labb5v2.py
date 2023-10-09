@@ -170,6 +170,7 @@ class School:
                     )
                 else:
                     print("Inget har ändrats")
+                    break
 
     def search_people(self):
         """
