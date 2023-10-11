@@ -149,7 +149,7 @@ class School:
         frågar vilket peronnummer personen har och söker personen i listorna,
         tar ut personen och skickar den till rename funktionen
         """
-        person_nr = person_nr_input(self.person_nr_list())
+        person_nr = person_nr_input()
 
         for student in self.students:
             if person_nr == student.person_nr:
@@ -166,7 +166,7 @@ class School:
         sedan så tar den bort personen
         """
         is_teacher = False
-        person_nr = person_nr_input(self.person_nr_list())
+        person_nr = person_nr_input()
         person = None
         for student in self.students:
             if person_nr == student.person_nr:
@@ -239,7 +239,7 @@ def nameinput(text="", wordcount=1):
             return name.split(" ")
 
 
-def person_nr_input(used_nr):
+def person_nr_input(used_nr = []):
     """
     kollar så att personnummret är ett gilltigt personnummer med 10 siffor,
     kollar först om det bara är siffror sdan om den tillhör en månad och en dag i den valda månaden
