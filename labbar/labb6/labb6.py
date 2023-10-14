@@ -1,3 +1,5 @@
+# Teo Bäckström, Otto, Tim grupp 29
+
 class Person:
     """
     Person klass med egenskpar som förnamn efternamn personnummer och roll,
@@ -25,14 +27,16 @@ class Person:
         """
         control_quest = ""
 
-        while control_quest != ("j" or "n"):
+        while control_quest not in ["j", "n"]:
             control_quest = input(
                 f"Vill du ändra namn på {self.firstname} {self.lastname} (j/n)?"
             ).lower()
             if control_quest == "j":
+                #tar in nytt namn
                 firstname, lastname = nameinput(
                     text="Skriv in det nya namnet:", wordcount=2
                 )
+                #sparar in nytt namn på personen
                 self.firstname = firstname
                 self.lastname = lastname
                 print(
@@ -93,28 +97,42 @@ class School:
             print(teacher)
 
     def auto_add_student(self):
+        """
+        funktion för att automatsikt lägga till studenter från en fil
+        Den retunerar ävan filnamnet så det kan användas för att spara filen
+        """
         filefound = False
         filename = input("Vad heter filen med alla studenter?")
-
+        #Kollar att filen finns
         while not filefound:
             try:
                 studentsfile = open(filename, "r")
                 filefound = True
             except:
                 filename = input("Den filen fanns inte! Skriv in en ny fil:")
+        
         students = []
+        #läser in varje rad i filen och sparar respektive egenskapar i en variabel
         person_nr = studentsfile.readline().strip()
         while person_nr != "":
             lastname = studentsfile.readline().strip()
             firstname = studentsfile.readline().strip()
+            #Sparar person info i lista
             students.append([firstname, lastname, person_nr])
             person_nr = studentsfile.readline().strip()
         studentsfile.close()
+        #Skapar studentbojekt för vare person och lägger i school's lista
         for student in students:
             self.students.append(Student(student[0], student[1], student[2]))
+        #retunerar filnamn
+        return filename
 
     def person_nr_list(self):
+        """
+        funktion för att sammla alla personers personnummer i en lista som sedan retuneras
+        """
         nr_list = []
+        
         for student in self.students:
             nr_list.append(student.person_nr)
         for teacher in self.teachers:
@@ -128,16 +146,18 @@ class School:
         """
         print("Är personen en Lärare eller Student?")
         role = ""
+        
         while role.lower() not in ["lärare", "student"]:
             role = input()
             if role.lower() not in ["lärare", "student"]:
                 print('Du måste ange "Lärare" eller "Student"')
+        #tar in namn
         firstname, lastname = nameinput(
             text="Vad heter personen? (firstname lastname)", wordcount=2
         )
-
+        #tar in personnummer
         person_nr = person_nr_input(self.person_nr_list())
-
+        #sparar som rätt objekt i rätt lista
         if role.lower() == "lärare":
             self.teachers.append(Teacher(firstname, lastname, person_nr))
         else:
@@ -149,15 +169,20 @@ class School:
         frågar vilket peronnummer personen har och söker personen i listorna,
         tar ut personen och skickar den till rename funktionen
         """
+        #tar in personnummer
         person_nr = person_nr_input()
-
+        person = None
+        #letar efter rätt person
         for student in self.students:
             if person_nr == student.person_nr:
                 person = student
         for teacher in self.teachers:
             if person_nr == teacher.person_nr:
                 person = teacher
-        person.rename()
+        if (person == None):
+            print("Ingen person hittades")
+        else:
+            person.rename()
 
     def remove_person(self):
         """
@@ -166,8 +191,10 @@ class School:
         sedan så tar den bort personen
         """
         is_teacher = False
+        #tar in personnummer
         person_nr = person_nr_input()
         person = None
+        #letar efter rätt person
         for student in self.students:
             if person_nr == student.person_nr:
                 person = student
@@ -181,12 +208,13 @@ class School:
         else:
             control_quest = ""
 
-            while control_quest != ("j" or "n"):
+            while control_quest not in ["j", "n"]:
                 control_quest = input(
                     f"Vill du ta bort {person.firstname} {person.lastname} (j/n)?"
                 ).lower()
 
                 if control_quest == "j":
+                    #tar bort personen från rätt lista
                     if is_teacher:
                         self.teachers.remove(person)
                     else:
@@ -204,12 +232,15 @@ class School:
         Sedan så skrivs alla personer i listan ut
         """
         people = []
+        #tar in namn
         firstname, lastname = nameinput(text="Vem vill du söka efter", wordcount=2)
+        #kollar efter alla lärare med namnent
         for teacher in self.teachers:
             if teacher.firstname.lower() == firstname.lower() and (
                 teacher.lastname.lower() == lastname.lower()
             ):
                 people.append(teacher)
+        #kollar efter alla studenter med namnet
         for student in self.students:
             if student.firstname.lower() == firstname.lower() and (
                 student.lastname.lower() == lastname.lower()
@@ -218,6 +249,7 @@ class School:
         if len(people) == 0:
             print(f"Ingen person med namnet {firstname} {lastname} kunde hittas")
         else:
+            #printar ut alla personer i listan
             for person in people:
                 print(person)
 
@@ -248,12 +280,13 @@ def person_nr_input(used_nr = []):
     monthday = [31, 29, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31]
     while not allowedinput:
         person_nr = input("Mata in personnummer (YYMMDDXXXX)")
-
+        #kollar att det är en int
         try:
             int(person_nr)
         except:
             print("Personnummret får bara innehålla siffor")
         else:
+            #kollar att datumet stämmer och att längden är 10 karaktärer
             month = int(person_nr[2:4])
             day = int(person_nr[4:6])
             if len(person_nr) != 10:
@@ -269,19 +302,32 @@ def person_nr_input(used_nr = []):
 
     return person_nr
 
+def save_to_file(school, filename):
+    """
+    funktion för att spara studenterna till vald lista
+    loopar igenom alla studenter och skriver ut varje rad i filen
+    """
+    file = open(filename, "w")
+    for person in school.students:
+        file.write(person.person_nr + "\n")
+        file.write(person.lastname + "\n")
+        file.write(person.firstname + "\n")
+        
+    file.close()
 
 def main():
     """
     funktion som kallar på alla andra funktioner,
-    börjar med att skapa en instans av School,
+    börjar med att skapa en instans av School samt kallar på auto_add_student() som lägger till alla studenter i en lista
     sedan så skriver den ut en meny till användaren där val leder till rätt funkiton som körs
     """
+    
     school = School()
-    school.auto_add_student()
+    filename = school.auto_add_student()
     value = ""
     while value != "7":
         value = input(
-            "1 Vill du lägga till\n2 Ändra\n3 Ta bort\n4 Söka ett objekt\n5 Skriva ut alla studenter\n6 Skriva ut alla lärare\n7 För att avsluta och spara\n"
+            "1 Vill du lägga till\n2 Ändra namn\n3 Ta bort\n4 Söka ett objekt\n5 Skriva ut alla studenter\n6 Skriva ut alla lärare\n7 Avsluta och spara\n"
         )
         if value == "1":
             school.addperson()
@@ -296,9 +342,10 @@ def main():
         elif value == "6":
             school.print_teachers()
         elif value == "7":
+            save_to_file(school, filename)
             print("Hejdå")
         else:
             print("felaktig input")
 
-
+#kör main-funktionen
 main()
