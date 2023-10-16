@@ -1,3 +1,6 @@
+import time
+
+
 class Trolls:
     def __init__(self, x_pos, y_pos) -> None:
         self.x_pos = x_pos
@@ -107,6 +110,20 @@ class Gameboard:
         print("Du vann")
 
 
+def stopwatch(time_start):
+    time_result = time.time() - time_start
+    mins = time_result // 60
+    sec = time_result % 60
+    print(f"{mins} minuter : {sec} sekunders")
+    return f"{mins} minuter : {sec} sekunders"
+
+
+def save_to_file(time):
+    rekord_file = open("rekord.txt", "a")
+    rekord_file.write(time + "\n")
+    rekord_file.close()
+
+
 """def checksurround(y, x, A, n):
     if A[y][x] == "|*":
         print("Är samma")
@@ -213,6 +230,8 @@ def main():
 
         while game.checksurround()"""
 
-
+time_start = time.time()
 test = Gameboard(5)
 test.gameplay()
+final_time = stopwatch(time_start)
+save_to_file(final_time)
