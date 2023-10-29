@@ -124,6 +124,71 @@ def save_to_file(time):
     rekord_file.close()
 
 
+"""def bruteforce_solve():
+    game = Gameboard(5)
+    rows = [0] * game.size
+    allowed_input = False
+    print(game)
+    while game.turn < game.size:
+        while not allowed_input:
+            allowed_input = game.checksurround(rows[game.turn])
+            if not allowed_input:
+                game.turn = 0
+                while True:
+                    kkk = True
+                    for i in range(game.size):
+                        if rows[i] > game.size - 1:
+                            rows[i - 1] += 1
+                            rows[i] = 0
+                            kkk = False
+                    if kkk:
+                        break
+
+                rows[game.size - 1] += 1
+                print(rows)
+
+        troll = Trolls(rows[game.turn], game.turn)
+        game.gameboard[game.turn][rows[game.turn]] = str(troll)
+        print(game)
+        game.turn += 1
+        allowed_input = False
+    print(
+        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    )"""
+
+
+def bruteforce_solve():
+    game = Gameboard(8)
+    rows = [0] * game.size
+    allowed_input = False
+    print(game)
+    while game.turn < game.size:
+        allowed_input = game.checksurround(rows[game.turn])
+        if not allowed_input:
+            game = Gameboard(8)
+            rows[game.size - 1] += 1
+            while True:
+                kkk = True
+                for i in range(game.size):
+                    if rows[i] > game.size - 1:
+                        rows[i - 1] += 1
+                        rows[i] = 0
+                        kkk = False
+                if kkk:
+                    break
+
+        print(rows)
+
+        troll = Trolls(rows[game.turn], game.turn)
+        game.gameboard[game.turn][rows[game.turn]] = str(troll)
+        print(game)
+        game.turn += 1
+        allowed_input = False
+    print(
+        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    )
+
+
 """def checksurround(y, x, A, n):
     if A[y][x] == "|*":
         print("Är samma")
@@ -230,8 +295,9 @@ def main():
 
         while game.checksurround()"""
 
-time_start = time.time()
+"""time_start = time.time()
 test = Gameboard(5)
 test.gameplay()
 final_time = stopwatch(time_start)
-save_to_file(final_time)
+save_to_file(final_time)"""
+bruteforce_solve()
