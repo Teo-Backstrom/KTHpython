@@ -1,1 +1,3 @@
 0.0 minuter : 5.240619421005249 sekunders
+0.0 minuter : 29.991905689239502 sekunders
+0.0 minuter : 8.69199252128601 sekunders
