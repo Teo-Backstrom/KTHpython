@@ -1,10 +1,4 @@
-"""result = 1
+file = open("rekord.txt", "r")
 
-for q in range(2):
-    print(q)"""
-
-list = [1, 2]
-
-x, y = list
-
-print(x+y)
+for i in file:
+    print(i)

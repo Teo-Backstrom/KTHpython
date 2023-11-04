@@ -112,15 +112,25 @@ class Gameboard:
 
 def stopwatch(time_start):
     time_result = time.time() - time_start
-    mins = time_result // 60
+    """mins = time_result // 60
     sec = time_result % 60
     print(f"{mins} minuter : {sec} sekunders")
-    return f"{mins} minuter : {sec} sekunders"
+    return f"{mins} minuter : {sec} sekunders"""
+    
+    return time_result
 
 
 def save_to_file(time):
-    rekord_file = open("rekord.txt", "a")
-    rekord_file.write(time + "\n")
+    times = []
+    rekord_file = open("rekord.txt", "r")
+    for rekord in rekord_file:
+        times.append(float(rekord))
+    rekord_file.close()
+    times.append(float(time))
+    times.sort()
+    rekord_file = open("rekord.txt", "w")
+    for rekord in times:
+        rekord_file.write(str(rekord) + "\n")
     rekord_file.close()
 
 
@@ -157,15 +167,15 @@ def save_to_file(time):
     )"""
 
 
-def bruteforce_solve():
-    game = Gameboard(8)
+def bruteforce_solve(size):
+    game = Gameboard(size)
     rows = [0] * game.size
     allowed_input = False
     print(game)
     while game.turn < game.size:
         allowed_input = game.checksurround(rows[game.turn])
         if not allowed_input:
-            game = Gameboard(8)
+            game = Gameboard(size)
             rows[game.size - 1] += 1
             while True:
                 kkk = True
@@ -295,9 +305,10 @@ def main():
 
         while game.checksurround()"""
 
-"""time_start = time.time()
+time_start = time.time()
 test = Gameboard(5)
 test.gameplay()
 final_time = stopwatch(time_start)
-save_to_file(final_time)"""
-bruteforce_solve()
+save_to_file(final_time)
+
+#bruteforce_solve()
