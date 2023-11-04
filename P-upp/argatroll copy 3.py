@@ -89,23 +89,23 @@ class Gameboard:
                 self.gameboard[self.turn][x] = "|_"
 
 
-def gameplay(board):
+def gameplay(self):
     allowed_input = False
-    print(board)
-    while board.turn < board.size:
+    print(self)
+    while self.turn < self.size:
         while not allowed_input:
-            choice = board.read_coordinate()
+            choice = self.read_coordinate()
             if choice == "undo":
-                board.undo()
-                print(board)
+                self.undo()
+                print(self)
             else:
-                print(board.turn)
-                allowed_input = board.checksurround(choice)
+                print(self.turn)
+                allowed_input = self.checksurround(choice)
 
-        troll = Trolls(choice, board.turn)
-        board.gameboard[board.turn][choice] = str(troll)
-        print(board)
-        board.turn += 1
+        troll = Trolls(choice, self.turn)
+        self.gameboard[self.turn][choice] = str(troll)
+        print(self)
+        self.turn += 1
         allowed_input = False
 
     print("Du vann")
@@ -113,27 +113,42 @@ def gameplay(board):
 
 def stopwatch(time_start):
     time_result = time.time() - time_start
-    mins = time_result // 60
+    """mins = time_result // 60
     sec = time_result % 60
     print(f"{mins} minuter : {sec} sekunders")
-    return f"{mins} minuter : {sec} sekunders"
+    return f"{mins} minuter : {sec} sekunders"""
+
+    return time_result
 
 
 def save_to_file(time):
-    rekord_file = open("rekord.txt", "a")
-    rekord_file.write(time + "\n")
+    times = []
+    try:
+
+        rekord_file = open("rekord.txt", "r")
+        for rekord in rekord_file:
+            times.append(float(rekord))
+        rekord_file.close()
+        
+    except:
+        print("Inga gamla rekord")
+    times.append(float(time))
+    times.sort()
+    rekord_file = open("rekord.txt", "w")
+    for rekord in times:
+        rekord_file.write(str(rekord) + "\n")
     rekord_file.close()
 
 
-def bruteforce_solve():
-    game = Gameboard(8)
+def bruteforce_solve(size):
+    game = Gameboard(size)
     rows = [0] * game.size
     allowed_input = False
     print(game)
     while game.turn < game.size:
         allowed_input = game.checksurround(rows[game.turn])
         if not allowed_input:
-            game = Gameboard(8)
+            game = Gameboard(size)
             rows[game.size - 1] += 1
             while True:
                 kkk = True
@@ -157,9 +172,19 @@ def bruteforce_solve():
     )
 
 
+"""def test():
+    game = Gameboard(4)
+    print(game)
+
+    game.read_coordinate()
+    while game.turn < game.size:
+
+        while game.checksurround()"""
+
 time_start = time.time()
 board = Gameboard(5)
 gameplay(board)
 final_time = stopwatch(time_start)
 save_to_file(final_time)
+
 # bruteforce_solve()
