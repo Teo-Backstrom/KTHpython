@@ -1,5 +1,6 @@
 import time
 
+from tkinter import *
 
 class Trolls:
     def __init__(self, x_pos, y_pos) -> None:
@@ -29,7 +30,23 @@ class Gameboard:
                 textboard += self.gameboard[i][j]
             textboard += "|\n"
         return textboard
+    def button_click(self, x, y):
+        if y == self.turn:
+            
+            troll = Trolls(x, self.turn)
+            self.gameboard[self.turn][x] = str(troll)
+            self.print_board()
 
+            self.turn += 1
+            
+
+    
+    def print_board(self):
+        root = Tk()
+        for i in range(self.size):
+            for j in range(self.size):
+                Button(root,text=self.gameboard[i][j], command=self.button_click(j,i)).grid(row=i,column=j)  
+        root.mainloop()
     def checksurround(self, x):
         if self.gameboard[self.turn][x] == "|*":
             print("Är samma")
@@ -89,24 +106,17 @@ class Gameboard:
                 self.gameboard[self.turn][x] = "|_"
 
 
+    
 def gameplay(self):
-    allowed_input = False
-    print(self)
+    
+    self.print_board()
     while self.turn < self.size:
-        while not allowed_input:
-            choice = self.read_coordinate()
-            if choice == "undo":
-                self.undo()
-                print(self)
-            else:
-                print(self.turn)
-                allowed_input = self.checksurround(choice)
 
-        troll = Trolls(choice, self.turn)
-        self.gameboard[self.turn][choice] = str(troll)
-        print(self)
+        troll = Trolls(self.button_press, self.turn)
+        self.gameboard[self.turn][self.button_press] = str(troll)
+        self.print_board()
+
         self.turn += 1
-        allowed_input = False
 
     print("Du vann")
 
@@ -172,6 +182,8 @@ def bruteforce_solve(size):
     )
 
 
+
+
 """def test():
     game = Gameboard(4)
     print(game)
@@ -181,10 +193,10 @@ def bruteforce_solve(size):
 
         while game.checksurround()"""
 
-"""time_start = time.time()
+#time_start = time.time()
 board = Gameboard(5)
-gameplay(board)
-final_time = stopwatch(time_start)
-save_to_file(final_time)"""
-
-bruteforce_solve(6)
+board.print_board()
+#gameplay(board)
+#final_time = stopwatch(time_start)
+#save_to_file(final_time)
+#bruteforce_solve(4)

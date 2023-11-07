@@ -1,4 +1,5 @@
 import time
+import tkinter as tk
 
 
 class Trolls:
@@ -21,7 +22,22 @@ class Gameboard:
         self.gameboard = A
         self.size = size
         self.turn = 0
-
+        self.window = tk.Tk()
+        for i in range(size):
+            for j in range(size):
+                self.box = tk.Label(self.window, text= self.gameboard[i][j])
+                self.box.grid(row=i,column=j)
+        self.x_pos = tk.Entry(self.window)
+        self.x_pos.grid(row=size -1 ,column=size + 1)
+        
+        self.ok = tk.Button(self.window, text = "OK", command=self.update_output)
+        self.ok.grid(row=size, column=size + 2)
+        self.undo_button = tk.Button(self.window, text="UNDO", command=self.undo)
+        self.undo_button.grid(row = size, column= size + 1)
+        self.feedback = tk.StringVar()
+        self.feedback_label = tk.Label(self.window, textvariable = self.feedback)
+        self.feedback_label.grid(row=size - 2, column=size + 1)
+        self.window.mainloop()
     def __str__(self) -> str:
         textboard = ""
         for i in range(self.size):
@@ -29,7 +45,7 @@ class Gameboard:
                 textboard += self.gameboard[i][j]
             textboard += "|\n"
         return textboard
-
+    
     def checksurround(self, x):
         if self.gameboard[self.turn][x] == "|*":
             print("Är samma")
@@ -56,38 +72,52 @@ class Gameboard:
                     return False
         return True
 
-    def read_coordinate(self):
+    def read_coordinate(self, x_coord):
         approved_coords = False
 
-        while not approved_coords:
-            x_coord = input(
-                f"Skriv in X kordinat för rad {self.turn + 1} eller skriv undo: "
-            )
-            if x_coord.lower() == "undo":
-                approved_coords = True
+        try:
+            x_coord = int(x_coord) - 1
+        except:
+                print("Måste vara ett helttal, försök igen22")
+                self.feedback = "Måste vara ett helttal, försök igen22"
+        else:
+            if x_coord >= self.size or x_coord < 0:
+                print(
+                f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
+                )
+                self.feedback = f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
+                
             else:
-                try:
-                    x_coord = int(x_coord) - 1
-                except:
-                    print("Måste vara ett helttal, försök igen22")
-                else:
-                    if x_coord >= self.size or x_coord < 0:
-                        print(
-                            f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
-                        )
-                    else:
-                        approved_coords = True
-
-        return x_coord
+                approved_coords = True
+        if approved_coords:
+            return x_coord
 
     def undo(self):
         if self.turn < 1:
             print("Finns inga steg att ta bort")
+            self.feedback = "Finns inga steg att ta bort"
         else:
             self.turn -= 1
             for x in range(self.size):
                 self.gameboard[self.turn][x] = "|_"
-
+    def update_output(self):
+        
+        allowed_input = False
+        
+        choice = self.read_coordinate(self.x_pos.get())
+        allowed_input = self.checksurround(choice)
+        if allowed_input:
+            troll = Trolls(choice, self.turn)
+            self.gameboard[self.turn][choice] = str(troll)
+            for i in range(self.size):
+                for j in range(self.size):
+                    self.box = tk.Label(self.window, text= self.gameboard[i][j])
+                    self.box.grid(row=i,column=j)
+            self.turn += 1
+            allowed_input = False
+        if self.turn >= self.size: 
+            print("Du vann") 
+            self.feedback = "Du vann"
 
 def gameplay(self):
     allowed_input = False
@@ -164,6 +194,7 @@ def bruteforce_solve(size):
 
         troll = Trolls(rows[game.turn], game.turn)
         game.gameboard[game.turn][rows[game.turn]] = str(troll)
+        
         print(game)
         game.turn += 1
         allowed_input = False
@@ -187,4 +218,5 @@ gameplay(board)
 final_time = stopwatch(time_start)
 save_to_file(final_time)"""
 
-bruteforce_solve(6)
+#bruteforce_solve(6)
+board = Gameboard(5)
