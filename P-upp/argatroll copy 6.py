@@ -14,6 +14,7 @@ class Trolls:
 class Gameboard:
     def __init__(self, size) -> None:
         A = []
+        self.window = tk.Tk()
         for i in range(size):
             x = []
             for j in range(size):
@@ -23,7 +24,7 @@ class Gameboard:
         self.gameboard = A
         self.size = size
         self.turn = 0
-        self.window = tk.Tk()
+        
         for i in range(size):
             for j in range(size):
                 self.box = tk.Label(self.window, textvariable= self.gameboard[i][j])
@@ -50,26 +51,39 @@ class Gameboard:
     def checksurround(self, x):
         if self.gameboard[self.turn][x] == "|*":
             print("Är samma")
+            self.feedback.set("Är samma")
             return False
 
         if "|*" in self.gameboard[self.turn]:
             print("samma rad")
+            self.feedback.set("Samma rad")
+
+            
             return False
 
         for i in range(self.size):
-            if self.gameboard[i][x] == "|*":
+            if self.gameboard[i][x].get() == "|*":
                 print("Samma kolumn")
+                self.feedback.set("Samma kolumn")
+
+
                 return False
 
             if (x - self.turn + i < self.size) and (x - self.turn + i >= 0):
-                if self.gameboard[i][x - self.turn + i] == "|*":
+                if self.gameboard[i][x - self.turn + i].get() == "|*":
                     print("Diago")
+                    self.feedback.set("Diago")
+
+                    
                     return False
 
             if x + self.turn - i < self.size:
                 # här behlvs inte extra koll pga den kollar ned åt hög och kommer då bara kolla nedåt och inte hitta något för att man börjar uppeifårn ioch ned när man lägger ut troll
-                if self.gameboard[i][x + self.turn - i] == "|*":
+                if self.gameboard[i][x + self.turn - i].get() == "|*":
                     print("Diagonal")
+                    self.feedback.set("Diagonal")
+
+                    
                     return False
         return True
 
@@ -96,11 +110,13 @@ class Gameboard:
     def undo(self):
         if self.turn < 1:
             print("Finns inga steg att ta bort")
-            self.feedback = "Finns inga steg att ta bort"
+            self.feedback.set("Finns inga steg att ta bort")
         else:
             self.turn -= 1
             for x in range(self.size):
-                self.gameboard[self.turn][x] = "|_"
+                self.gameboard[self.turn][x].set("|_")
+                #self.gameboard[self.turn][x] = tk.StringVar(value=str("|_"))
+            
     def update_output(self):
         
         allowed_input = False
@@ -109,16 +125,18 @@ class Gameboard:
         allowed_input = self.checksurround(choice)
         if allowed_input:
             troll = Trolls(choice, self.turn)
-            self.gameboard[self.turn][choice] = str(troll)
-            for i in range(self.size):
+            self.gameboard[self.turn][choice].set(str(troll))
+            #self.gameboard[self.turn][choice] = tk.StringVar(value=str(troll))
+            """for i in range(self.size):
                 for j in range(self.size):
-                    self.box = tk.Label(self.window, text= self.gameboard[i][j])
-                    self.box.grid(row=i,column=j)
+                    self.box = tk.Label(self.window, textvariable = self.gameboard[i][j])               
+                    self.box.grid(row=i,column=j)"""
             self.turn += 1
             allowed_input = False
         if self.turn >= self.size: 
             print("Du vann") 
-            self.feedback = "Du vann"
+            self.feedback.set("Du vann")
+            
 
 def gameplay(self):
     allowed_input = False

@@ -23,3 +23,8 @@ class InputGUI:
         self.output["text"] = f"Hej, {self.name.get()}"
         
 a = InputGUI()
+
+
+
+self.gameboard[self.turn][choice].set(str(troll))
+self.gameboard[self.turn][choice] = tk.StringVar(value=str(troll))
