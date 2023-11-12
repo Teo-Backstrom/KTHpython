@@ -9,38 +9,41 @@ class Trolls:
 
     def __str__(self) -> str:
         return "|*"
-
+class Window: 
+    def __init__(self, size):
+        game = Gameboard(size)
+        self.window = tk.Tk()
+        self.feedback = tk.StringVar()
+        self.ok = tk.Button(self.window, text = "OK", command=update_output(self,game))
+        self.ok.grid(row=size, column=size + 2)
+        self.undo_button = tk.Button(self.window, text="UNDO", command=self.undo)
+        self.undo_button.grid(row = size, column= size + 1)
+        self.feedback = tk.StringVar()
+        self.feedback_label = tk.Label(self.window, textvariable = self.feedback)
+        self.feedback_label.grid(row=size - 2, column=size + 1)
+        for i in range(size):
+            for j in range(size):
+                self.box = tk.Label(self.window, textvariable= self.gameboard[i][j])
+                self.box.grid(row=i,column=j)
+        self.x_pos = tk.Entry(self.window)
+        self.x_pos.grid(row=size -1 ,column=size + 1)
+        self.window.mainloop()
 
 class Gameboard:
     def __init__(self, size) -> None:
+        self.size = size
+        self.turn = 0
         A = []
         self.window = tk.Tk()
         for i in range(size):
             x = []
             for j in range(size):
-                entity = tk.StringVar(value="|_")
+                entity = tk.StringVar(value= "|_")
                 x.append(entity)
             A.append(x)
         self.gameboard = A
-        self.size = size
-        self.turn = 0
 
-        for i in range(size):
-            for j in range(size):
-                self.box = tk.Label(self.window, textvariable=self.gameboard[i][j])
-                self.box.grid(row=i, column=j)
-        self.x_pos = tk.Entry(self.window)
-        self.x_pos.grid(row=size - 1, column=size + 1)
-
-        self.ok = tk.Button(self.window, text="OK", command=self.update_output)
-        self.ok.grid(row=size, column=size + 2)
-        self.undo_button = tk.Button(self.window, text="UNDO", command=self.undo)
-        self.undo_button.grid(row=size, column=size + 1)
-        self.feedback = tk.StringVar()
-        self.feedback_label = tk.Label(self.window, textvariable=self.feedback)
-        self.feedback_label.grid(row=size - 2, column=size + 1)
-        self.window.mainloop()
-
+        
     def __str__(self) -> str:
         textboard = ""
         for i in range(self.size):
@@ -48,7 +51,7 @@ class Gameboard:
                 textboard += self.gameboard[i][j]
             textboard += "|\n"
         return textboard
-
+    
     def checksurround(self, x):
         if self.gameboard[self.turn][x] == "|*":
             print("Är samma")
@@ -59,12 +62,14 @@ class Gameboard:
             print("samma rad")
             self.feedback.set("Samma rad")
 
+            
             return False
 
         for i in range(self.size):
             if self.gameboard[i][x].get() == "|*":
                 print("Samma kolumn")
                 self.feedback.set("Samma kolumn")
+
 
                 return False
 
@@ -73,6 +78,7 @@ class Gameboard:
                     print("Diago")
                     self.feedback.set("Diago")
 
+                    
                     return False
 
             if x + self.turn - i < self.size:
@@ -81,6 +87,7 @@ class Gameboard:
                     print("Diagonal")
                     self.feedback.set("Diagonal")
 
+                    
                     return False
         return True
 
@@ -90,15 +97,15 @@ class Gameboard:
         try:
             x_coord = int(x_coord) - 1
         except:
-            print("Måste vara ett helttal, försök igen22")
-            self.feedback = "Måste vara ett helttal, försök igen22"
+                print("Måste vara ett helttal, försök igen22")
+                self.feedback = "Måste vara ett helttal, försök igen22"
         else:
             if x_coord >= self.size or x_coord < 0:
                 print(
-                    f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
+                f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
                 )
                 self.feedback = f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
-
+                
             else:
                 approved_coords = True
         if approved_coords:
@@ -112,27 +119,28 @@ class Gameboard:
             self.turn -= 1
             for x in range(self.size):
                 self.gameboard[self.turn][x].set("|_")
-                # self.gameboard[self.turn][x] = tk.StringVar(value=str("|_"))
-
-    def update_output(self):
+                #self.gameboard[self.turn][x] = tk.StringVar(value=str("|_"))
+            
+def update_output(window, game):
+        
+    allowed_input = False
+        
+    choice = game.read_coordinate(window.x_pos.get())
+    allowed_input = game.checksurround(choice)
+    if allowed_input:
+        troll = Trolls(choice, game.turn)
+        game.gameboard[game.turn][choice].set(str(troll))
+        #self.gameboard[self.turn][choice] = tk.StringVar(value=str(troll))
+        """for i in range(self.size):
+            for j in range(self.size):
+                self.box = tk.Label(self.window, textvariable = self.gameboard[i][j])               
+                self.box.grid(row=i,column=j)"""
+        game.turn += 1
         allowed_input = False
-
-        choice = self.read_coordinate(self.x_pos.get())
-        allowed_input = self.checksurround(choice)
-        if allowed_input:
-            troll = Trolls(choice, self.turn)
-            self.gameboard[self.turn][choice].set(str(troll))
-            # self.gameboard[self.turn][choice] = tk.StringVar(value=str(troll))
-            """for i in range(self.size):
-                for j in range(self.size):
-                    self.box = tk.Label(self.window, textvariable = self.gameboard[i][j])               
-                    self.box.grid(row=i,column=j)"""
-            self.turn += 1
-            allowed_input = False
-        if self.turn >= self.size:
-            print("Du vann")
-            self.feedback.set("Du vann")
-
+    if game.turn >= game.size: 
+        print("Du vann") 
+        window.feedback.set("Du vann")
+            
 
 def gameplay(self):
     allowed_input = False
@@ -148,7 +156,7 @@ def gameplay(self):
                 allowed_input = self.checksurround(choice)
 
         troll = Trolls(choice, self.turn)
-        self.gameboard[self.turn][choice] = str(troll)
+        self.window.gameboard[self.turn][choice] = str(troll)
         print(self)
         self.turn += 1
         allowed_input = False
@@ -169,11 +177,12 @@ def stopwatch(time_start):
 def save_to_file(time):
     times = []
     try:
+
         rekord_file = open("rekord.txt", "r")
         for rekord in rekord_file:
             times.append(float(rekord))
         rekord_file.close()
-
+        
     except:
         print("Inga gamla rekord")
     times.append(float(time))
@@ -208,7 +217,7 @@ def bruteforce_solve(size):
 
         troll = Trolls(rows[game.turn], game.turn)
         game.gameboard[game.turn][rows[game.turn]] = str(troll)
-
+        
         print(game)
         game.turn += 1
         allowed_input = False
@@ -232,5 +241,5 @@ gameplay(board)
 final_time = stopwatch(time_start)
 save_to_file(final_time)"""
 
-# bruteforce_solve(6)
-board = Gameboard(5)
+#bruteforce_solve(6)
+board = Window(5)
