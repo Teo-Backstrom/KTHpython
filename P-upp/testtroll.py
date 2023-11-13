@@ -10,7 +10,57 @@ class Trolls:
     def __str__(self) -> str:
         return "🧍🏿"
 
+class Rules:
+    def __init__(self) -> None:
+        self.popup = tk.Tk()
+        self.popup.geometry("1200x500")
+        self.rules_text = tk.Label(self.popup, text=("Som vi alla vet så finns det många troll som bor i skogen och vissa av dessa troll\n" +
+        "kan vara ganska arga. Det är därför viktigt att trollen inte kan se n˚agra andra arga troll för då böjar de bråka.\n" +
+        " Detta är inte ett lika stort problem som man skulle kunna tro då troll är ganska dumma. De är väldigt bundna till naturen\n" +
+        "och tittar bara i de fyra väderstrecken samt diagonalerna mellan väderstrecken, sydöst,sydväst, osv\n" +
+        
+        "Reglerna för spelet är ganska enkla. Det ska finnas:\n" +
+        "• Ett troll per rad.\n" +
+        "• Ett troll per kolumn.\n" +
+        "• Inga troll får finnas på samma diagonal.\n"
+        
+        ), font=("Times New Roman", 14))
+        self.rules_text.grid(row=1, padx=200)
+        self.ok = tk.Button(self.popup, text="Ok", command=self.start)
+        self.ok.grid(row=2)
+        self.popup.mainloop()
+    def start(self):
+        self.popup.destroy()
+        Popup()
 
+class Popup:
+    def __init__(self) -> None:
+        self.popup = tk.Tk()
+        self.popup.geometry("400x200")
+        self.feedback_var = tk.StringVar(value="Ange storlek på spelplanen")
+        self.size_input = tk.Entry(self.popup, font=("Times New Roman", 20))
+        self.size_input.grid(row=2, column= 1, padx= 50)
+        self.feedback_label = tk.Label(self.popup, textvariable=self.feedback_var)
+        self.feedback_label.grid(row=1, column= 1, pady=30)
+        self.ok = tk.Button(self.popup, text="Ok", command= self.get_size)
+        self.ok.grid(row=3, column= 1)
+        self.popup.mainloop()
+    
+    def get_size(self):
+        try:
+            size = int(self.size_input.get())
+        except:
+            self.feedback_var.set("Värdet måste vara en int")
+        else:
+            if size < 4:
+                self.feedback_var.set("Planen måste minst vara 4x4")
+            elif size > 8:
+                self.feedback_var.set("Planen får inte plats, updatering kommer snart")
+            else: 
+                self.popup.destroy()
+                GameApp(size)
+                
+                
 class Gameboard:
     def __init__(self, size, root) -> None:
         A = []
@@ -34,33 +84,33 @@ class Gameboard:
         return textboard
 
     def checksurround(self, x, feedback_var):
-        if self.gameboard[self.turn][x].get() == "|*":
+        if self.gameboard[self.turn][x].get() == "🧍🏿":
             print("Är samma")
             feedback_var.set("Är samma")
             return False
 
-        if "|*" in [self.gameboard[self.turn][i].get() for i in range(self.size)]:
+        if "🧍🏿" in [self.gameboard[self.turn][i].get() for i in range(self.size)]:
             print("samma rad")
             feedback_var.set("samm rad")
 
             return False
 
         for i in range(self.size):
-            if self.gameboard[i][x].get() == "|*":
+            if self.gameboard[i][x].get() == "🧍🏿":
                 print("Samma kolumn")
                 feedback_var.set("Samma kolumn")
 
                 return False
 
             if (x - self.turn + i < self.size) and (x - self.turn + i >= 0):
-                if self.gameboard[i][x - self.turn + i].get() == "|*":
+                if self.gameboard[i][x - self.turn + i].get() == "🧍🏿":
                     print("Diago")
                     feedback_var.set("Diago")
 
                     return False
 
             if x + self.turn - i < self.size:
-                if self.gameboard[i][x + self.turn - i].get() == "|*":
+                if self.gameboard[i][x + self.turn - i].get() == "🧍🏿":
                     print("Diagonal")
                     feedback_var.set("Diagonal")
 
@@ -96,7 +146,7 @@ class Gameboard:
         else:
             self.turn -= 1
             for x in range(self.size):
-                self.gameboard[self.turn][x].set("|_")
+                self.gameboard[self.turn][x].set("↟")
 
     def update_output(self, x_pos_entry, feedback_var):
         allowed_input = False
@@ -115,8 +165,8 @@ class Gameboard:
 class GameApp:
     def __init__(self, size) -> None:
         self.window = tk.Tk()
-        self.window.geometry("1200x900")
-
+        self.window.geometry(str(300*size) + "x" + str(200*size))
+        self.feedback = tk.StringVar()
         self.gameboard = Gameboard(
             size, self.window
         )  # Pass the Tkinter root to the Gameboard instance
@@ -153,14 +203,19 @@ class GameApp:
         )
         self.undo_button.grid(row=size, column=size + 1)
 
-        self.feedback = tk.StringVar()
+        self.x_pos_label = tk.Label(
+            self.window, text="Ange X kordinat", font=("Times New Roman", 20)
+        )
+        self.x_pos_label.grid(row=size - 2, column=size + 1, columnspan=2, rowspan= 2)
+
+        
         self.feedback_label = tk.Label(
             self.window, textvariable=self.feedback, font=("Times New Roman", 20)
         )
-        self.feedback_label.grid(row=size - 2, column=size + 1, columnspan=2)
+        self.feedback_label.grid(row=size - 3, column=size + 1, columnspan=2, rowspan= 2)
 
         self.window.mainloop()
 
 
 if __name__ == "__main__":
-    GameApp(5)
+    Rules()
