@@ -64,60 +64,59 @@ class Popup:
                 self.feedback_var.set("Planen får inte plats, updatering kommer snart")
             else:
                 self.popup.destroy()
-                GameApp(size)
-                # bruteforce_solve(size)
+                # GameApp(size)
+                bruteforce_solve(size)
 
 
 class Gameboard:
-    def __init__(self, size, root) -> None:
+    def __init__(self, size) -> None:
         A = []
         for i in range(size):
             x = []
             for j in range(size):
-                entity = tk.StringVar(value="↟")
-                x.append(entity)
+                # entity = tk.StringVar(value="↟")
+                x.append("↟")
             A.append(x)
         self.gameboard = A
         self.size = size
         self.turn = 0
-        self.root = root  # Pass the Tkinter root to the Gameboard class
 
     def __str__(self) -> str:
         textboard = ""
         for i in range(self.size):
             for j in range(self.size):
-                textboard += self.gameboard[i][j].get()
+                textboard += self.gameboard[i][j]
             textboard += "|\n"
         return textboard
 
     def checksurround(self, x, feedback_var):
-        if self.gameboard[self.turn][x].get() == "*":
+        if self.gameboard[self.turn][x] == "*":
             print("Är samma")
             feedback_var.set("Är samma")
             return False
 
-        if "*" in [self.gameboard[self.turn][i].get() for i in range(self.size)]:
+        if "*" in [self.gameboard[self.turn][i] for i in range(self.size)]:
             print("samma rad")
             feedback_var.set("samm rad")
 
             return False
 
         for i in range(self.size):
-            if self.gameboard[i][x].get() == "*":
+            if self.gameboard[i][x] == "*":
                 print("Samma kolumn")
                 feedback_var.set("Samma kolumn")
 
                 return False
 
             if (x - self.turn + i < self.size) and (x - self.turn + i >= 0):
-                if self.gameboard[i][x - self.turn + i].get() == "*":
+                if self.gameboard[i][x - self.turn + i] == "*":
                     print("Diago")
                     feedback_var.set("Diago")
 
                     return False
 
             if x + self.turn - i < self.size:
-                if self.gameboard[i][x + self.turn - i].get() == "*":
+                if self.gameboard[i][x + self.turn - i] == "*":
                     print("Diagonal")
                     feedback_var.set("Diagonal")
 
@@ -153,7 +152,7 @@ class Gameboard:
         else:
             self.turn -= 1
             for x in range(self.size):
-                self.gameboard[self.turn][x].set("↟")
+                self.gameboard[self.turn][x] = "↟"
 
     def update_output(self, x_pos_entry, feedback_var):
         allowed_input = False
@@ -161,7 +160,7 @@ class Gameboard:
         allowed_input = self.checksurround(choice, feedback_var)
         if allowed_input:
             troll = Trolls(choice, self.turn)
-            self.gameboard[self.turn][choice].set(str(troll))
+            self.gameboard[self.turn][choice] = str(troll)
             self.turn += 1
             allowed_input = False
         if self.turn >= self.size:
@@ -174,16 +173,13 @@ class GameApp:
         self.window = tk.Tk()
         self.window.geometry(str(300 * size) + "x" + str(200 * size))
         self.feedback = tk.StringVar()
-        self.gameboard = Gameboard(
-            size, self.window
-        )  # Pass the Tkinter root to the Gameboard instance
-        """if gaming != None:
-            self.gameboard = gaming"""
+        self.gameboard = Gameboard(size)
+
         for i in range(size):
             for j in range(size):
                 self.box = tk.Label(
                     self.window,
-                    textvariable=self.gameboard.gameboard[i][j],
+                    text=self.gameboard.gameboard[i][j],
                     width=4,
                     height=2,
                     font=("Times New Roman", 50),
@@ -198,7 +194,10 @@ class GameApp:
         self.ok = tk.Button(
             self.window,
             text="OK",
-            command=lambda: self.gameboard.update_output(self.x_pos, self.feedback),
+            command=lambda: [
+                self.gameboard.update_output(self.x_pos, self.feedback),
+                self.update_game(size),
+            ],
             font=("Times New Roman", 20),
         )
         self.ok.grid(row=size, column=size + 2)
@@ -206,7 +205,10 @@ class GameApp:
         self.undo_button = tk.Button(
             self.window,
             text="UNDO",
-            command=lambda: self.gameboard.undo(self.feedback),
+            command=lambda: [
+                self.gameboard.undo(self.feedback),
+                self.update_game(size),
+            ],
             font=("Times New Roman", 20),
         )
         self.undo_button.grid(row=size, column=size + 1)
@@ -222,6 +224,18 @@ class GameApp:
         self.feedback_label.grid(row=size - 3, column=size + 1, columnspan=2, rowspan=2)
 
         self.window.mainloop()
+
+    def update_game(self, size):
+        for i in range(size):
+            for j in range(size):
+                self.box = tk.Label(
+                    self.window,
+                    text=self.gameboard.gameboard[i][j],
+                    width=4,
+                    height=2,
+                    font=("Times New Roman", 50),
+                )
+                self.box.grid(row=i, column=j)
 
 
 """def bruteforce_solve(size):
@@ -256,6 +270,42 @@ class GameApp:
 
     GameApp(size, game)
 """
+
+
+def bruteforce_solve(size):
+    game = Gameboard(size)
+    rows = [0] * game.size
+    allowed_input = False
+    print(game)
+    while game.turn < game.size:
+        allowed_input = game.checksurround(rows[game.turn])
+        if not allowed_input:
+            game = Gameboard(size)
+            rows[game.size - 1] += 1
+            while True:
+                kkk = True
+                for i in range(game.size):
+                    if rows[i] > game.size - 1:
+                        rows[i - 1] += 1
+                        rows[i] = 0
+                        kkk = False
+                if kkk:
+                    break
+
+        print(rows)
+
+        troll = Trolls(rows[game.turn], game.turn)
+        game.gameboard[game.turn][rows[game.turn]] = str(troll)
+        print(game)
+        game.turn += 1
+        allowed_input = False
+    print(
+        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    )
+    app = GameApp(size)
+    app.gameboard = game.gameboard
+    app.update_game(size)
+
 
 if __name__ == "__main__":
     Rules()
