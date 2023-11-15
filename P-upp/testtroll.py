@@ -58,7 +58,8 @@ class Popup:
                 self.feedback_var.set("Planen får inte plats, updatering kommer snart")
             else: 
                 self.popup.destroy()
-                GameApp(size)
+                #GameApp(size)
+                bruteforce_solve(size)
                 
                 
 class Gameboard:
@@ -216,6 +217,37 @@ class GameApp:
 
         self.window.mainloop()
 
+def bruteforce_solve(size):
+    game = GameApp(size)
+    rows = [0] * size
+    allowed_input = False
+    while game.gameboard.turn < size:
+        allowed_input = game.gameboard.checksurround(rows[game.gameboard.turn], game.feedback)
+        if not allowed_input:
+            
+            game = GameApp(size)
+            rows[size - 1] += 1
+            while True:
+                kkk = True
+                for i in range(size):
+                    if rows[i] > size - 1:
+                        rows[i - 1] += 1
+                        rows[i] = 0
+                        kkk = False
+                if kkk:
+                    break
+                game.window.destroy()
 
+        print(rows)
+
+        #troll = Trolls(rows[game.gameboard.turn], game.gameboard.turn)
+        game.gameboard.gameboard[game.gameboard.turn][rows[game.gameboard.turn]].set("🧍🏿")
+        game.gameboard.turn += 1
+        allowed_input = False
+    print(
+        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    )
+    
+    
 if __name__ == "__main__":
     Rules()
