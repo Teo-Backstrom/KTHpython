@@ -78,6 +78,7 @@ class Popup:
 
 class Gameboard:
     def __init__(self, size, root) -> None:
+        self.time = time.time()
         A = []
         for i in range(size):
             x = []
@@ -175,6 +176,7 @@ class Gameboard:
         if self.turn >= self.size:
             print("Du vann")
             feedback_var.set("Du vann")
+            save_to_file(stopwatch(self.time))
 
 
 class GameApp:
@@ -273,6 +275,34 @@ def bruteforce_solve(size):
             )
             box.grid(row=i, column=j)
     root.mainloop()
+
+def stopwatch(time_start):
+    time_result = time.time() - time_start
+    """mins = time_result // 60
+    sec = time_result % 60
+    print(f"{mins} minuter : {sec} sekunders")
+    return f"{mins} minuter : {sec} sekunders"""
+    time_result = round(time_result,2)
+    return time_result
+
+
+def save_to_file(time):
+    times = []
+    try:
+
+        rekord_file = open("rekord.txt", "r")
+        for rekord in rekord_file:
+            times.append(float(rekord))
+        rekord_file.close()
+        
+    except:
+        print("Inga gamla rekord")
+    times.append(float(time))
+    times.sort()
+    rekord_file = open("rekord.txt", "w")
+    for rekord in times:
+        rekord_file.write(str(rekord) + "\n")
+    rekord_file.close()
 
 
 if __name__ == "__main__":
