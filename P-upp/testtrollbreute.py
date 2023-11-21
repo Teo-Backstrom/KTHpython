@@ -11,6 +11,32 @@ class Trolls:
         return "*"
 
 
+class Highscore:
+    def __init__(self) -> None:
+        self.window = tk.Tk()
+        self.window.geometry("500x1200")
+        self.highscores = self.get_highscore()
+        if len(self.highscores) >= 10:
+            amount_scores = 10
+        else:
+            amount_scores = len(self.highscores)
+        for i in range(amount_scores):
+            self.score = tk.Label(
+                self.window,
+                text= f"{self.highscores[i]} sekunder"
+            )
+            self.score.grid(row=i)
+
+
+    def get_highscore(self):
+        times = []
+        rekord_file = open("rekord.txt", "r")
+        for rekord in rekord_file:
+            times.append(float(rekord))
+        rekord_file.close()
+        return times
+
+
 class Rules:
     def __init__(self) -> None:
         self.popup = tk.Tk()
@@ -30,13 +56,29 @@ class Rules:
             font=("Times New Roman", 14),
         )
         self.rules_text.grid(row=1, padx=200)
-        self.ok = tk.Button(self.popup, text="Ok", command=self.start)
+        self.ok = tk.Button(self.popup, text="Play", command=self.start_game)
         self.ok.grid(row=2)
+        self.highscore = tk.Button(
+            self.popup, text="Highscores", command=self.start_highscore
+        )
+        self.highscore.grid(row=3)
+        self.feedback = tk.StringVar()
+        self.feedback_label = tk.Label(self.popup, textvariable=self.feedback, font=("Times New Roman", 30))
+        self.feedback_label.grid(row=4)
         self.popup.mainloop()
 
-    def start(self):
+    def start_game(self):
         self.popup.destroy()
         Popup()
+
+    def start_highscore(self):
+        try:
+            open("rekord.txt", "r")
+        except:
+            self.feedback.set("Inga higscores finns")
+        else:
+            self.popup.destroy()
+            Highscore()
 
 
 class Popup:
@@ -67,7 +109,7 @@ class Popup:
             if size < 4:
                 self.feedback_var.set("Planen måste minst vara 4x4")
             elif size > 8:
-                self.feedback_var.set("Planen får inte plats, updatering kommer snart")
+                self.feedback_var.set("Planen får inte plats, updatering kommande")
             else:
                 self.popup.destroy()
                 if play:
@@ -166,8 +208,10 @@ class Gameboard:
 
     def update_output(self, x_pos_entry, feedback_var):
         allowed_input = False
+        choice = None
         choice = self.read_coordinate(x_pos_entry.get(), feedback_var)
-        allowed_input = self.checksurround(choice, feedback_var)
+        if choice != None:
+            allowed_input = self.checksurround(choice, feedback_var)
         if allowed_input:
             troll = Trolls(choice, self.turn)
             self.gameboard[self.turn][choice].set(str(troll))
@@ -176,7 +220,11 @@ class Gameboard:
         if self.turn >= self.size:
             print("Du vann")
             feedback_var.set("Du vann")
+            time.sleep(3)
+            self.root.destroy()
+            
             save_to_file(stopwatch(self.time))
+
 
 
 class GameApp:
@@ -230,7 +278,6 @@ class GameApp:
             self.window, textvariable=self.feedback, font=("Times New Roman", 20)
         )
         self.feedback_label.grid(row=size - 3, column=size + 1, columnspan=2, rowspan=2)
-
         self.window.mainloop()
 
 
@@ -276,25 +323,25 @@ def bruteforce_solve(size):
             box.grid(row=i, column=j)
     root.mainloop()
 
+
 def stopwatch(time_start):
     time_result = time.time() - time_start
     """mins = time_result // 60
     sec = time_result % 60
     print(f"{mins} minuter : {sec} sekunders")
     return f"{mins} minuter : {sec} sekunders"""
-    time_result = round(time_result,2)
+    time_result = round(time_result, 2)
     return time_result
 
 
 def save_to_file(time):
     times = []
     try:
-
         rekord_file = open("rekord.txt", "r")
         for rekord in rekord_file:
             times.append(float(rekord))
         rekord_file.close()
-        
+
     except:
         print("Inga gamla rekord")
     times.append(float(time))

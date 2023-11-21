@@ -169,7 +169,6 @@ class Gameboard:
             print("Du vann")
             feedback_var.set("Du vann")
             save_to_file(stopwatch(self.time))
-            
 
 
 class GameApp:
@@ -226,6 +225,7 @@ class GameApp:
 
         self.window.mainloop()
 
+
 def stopwatch(time_start):
     time_result = time.time() - time_start
     """mins = time_result // 60
@@ -239,12 +239,11 @@ def stopwatch(time_start):
 def save_to_file(time):
     times = []
     try:
-
         rekord_file = open("rekord.txt", "r")
         for rekord in rekord_file:
             times.append(float(rekord))
         rekord_file.close()
-        
+
     except:
         print("Inga gamla rekord")
     times.append(float(time))
