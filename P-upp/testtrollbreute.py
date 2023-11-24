@@ -80,7 +80,29 @@ class Rules:
             self.popup.destroy()
             Highscore()
 
+class Winner:
+    def __init__(self, time_start) -> None:
+        self.popup = tk.Tk()
+        self.popup.geometry("1200x500")
+        self.rules_text = tk.Label(
+            self.popup,
+            text=("Du vann"),
+            font=("Times New Roman", 30),
+        )
+        self.rules_text.grid(row=1)
+        self.time_label = tk.Label(
+            self.popup,
+            text=(stopwatch(time_start)),
+            font=("Times New Roman", 30),
+        )
+        self.time_label.grid(row=2)
+        self.restart_button = tk.Button(self.popup, text="Restart", command=self.restart)
+        self.restart_button.grid(row=3)
+        self.popup.mainloop()
 
+    def restart(self):
+        self.popup.destroy()
+        Rules()
 class Popup:
     def __init__(self) -> None:
         self.popup = tk.Tk()
@@ -98,6 +120,7 @@ class Popup:
             self.popup, text="Solve", command=lambda: self.get_size(False)
         )
         self.brute.grid(row=4, column=1)
+        
         self.popup.mainloop()
 
     def get_size(self, play):
@@ -141,13 +164,14 @@ class Gameboard:
             textboard += "|\n"
         return textboard
 
-    def checksurround(self, x, feedback_var):
-        if self.gameboard[self.turn][x].get() == "*":
+    def checksurround(self, x, y, feedback_var):
+        if self.gameboard[y][x].get() == "*":
             print("Är samma")
             feedback_var.set("Är samma")
+            self.undo(x,y,feedback_var)
             return False
 
-        if "*" in [self.gameboard[self.turn][i].get() for i in range(self.size)]:
+        if "*" in [self.gameboard[y][i].get() for i in range(self.size)]:
             print("samma rad")
             feedback_var.set("samm rad")
 
@@ -160,31 +184,32 @@ class Gameboard:
 
                 return False
 
-            if (x - self.turn + i < self.size) and (x - self.turn + i >= 0):
-                if self.gameboard[i][x - self.turn + i].get() == "*":
+            if (x - y + i < self.size) and (x - y + i >= 0):
+                if self.gameboard[i][x - y + i].get() == "*":
                     print("Diago")
                     feedback_var.set("Diago")
 
                     return False
 
-            if x + self.turn - i < self.size:
-                if self.gameboard[i][x + self.turn - i].get() == "*":
+            if x + y - i < y:
+                if self.gameboard[i][x + y - i].get() == "*":
                     print("Diagonal")
                     feedback_var.set("Diagonal")
 
                     return False
         return True
 
-    def read_coordinate(self, x_coord, feedback_var):
+    def read_coordinate(self, x, y, feedback_var):
         approved_coords = False
 
         try:
-            x_coord = int(x_coord) - 1
+            x = int(x)
+            y = int(y)
         except:
             print("Måste vara ett heltal, försök igen22")
             feedback_var.set("Måste vara ett heltal,\n försök igen")
         else:
-            if x_coord >= self.size or x_coord < 0:
+            if x >= self.size or x < 0 or y >= self.size or y < 0:
                 print(
                     f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
                 )
@@ -194,38 +219,35 @@ class Gameboard:
             else:
                 approved_coords = True
         if approved_coords:
-            return x_coord
+            return x, y
 
-    def undo(self, feedback_var):
+    def undo(self,x,y, feedback_var):
         if self.turn < 1:
             print("Finns inga steg att ta bort")
             feedback_var.set("Finns inga steg att ta bort")
 
         else:
             self.turn -= 1
-            for x in range(self.size):
-                self.gameboard[self.turn][x].set("↟")
+            self.gameboard[y][x].set("↟")
 
-    def update_output(self, x_pos_entry, feedback_var):
+    def update_output(self, x, y, feedback_var):
+        print(x, y)
         allowed_input = False
-        choice = None
-        choice = self.read_coordinate(x_pos_entry.get(), feedback_var)
-        if choice != None:
-            allowed_input = self.checksurround(choice, feedback_var)
+        #x, y = self.read_coordinate(x, y, feedback_var)
+        allowed_input = self.checksurround(x, y, feedback_var)
         if allowed_input:
-            troll = Trolls(choice, self.turn)
-            self.gameboard[self.turn][choice].set(str(troll))
+            troll = Trolls(x, y)
+            self.gameboard[y][x].set(str(troll))
             self.turn += 1
             allowed_input = False
         if self.turn >= self.size:
-            print("Du vann")
-            feedback_var.set("Du vann")
-            time.sleep(3)
             self.root.destroy()
+            Winner(self.time)
             
             save_to_file(stopwatch(self.time))
 
 
+        
 
 class GameApp:
     def __init__(self, size) -> None:
@@ -239,16 +261,17 @@ class GameApp:
             self.gameboard = gaming"""
         for i in range(size):
             for j in range(size):
-                self.box = tk.Label(
+                self.box = tk.Button(
                     self.window,
                     textvariable=self.gameboard.gameboard[i][j],
-                    width=4,
-                    height=2,
+                    command= lambda y = i, x = j: self.gameboard.update_output(x, y, self.feedback),
+                    width=3,
+                    height=1,
                     font=("Times New Roman", 50),
                 )
                 self.box.grid(row=i, column=j)
 
-        self.x_pos = tk.Entry(
+        """self.x_pos = tk.Entry(
             self.window, font=("Times New Roman", 20), justify="center"
         )
         self.x_pos.grid(row=size - 1, column=size + 1, columnspan=2)
@@ -272,7 +295,7 @@ class GameApp:
         self.x_pos_label = tk.Label(
             self.window, text="Ange X kordinat", font=("Times New Roman", 20)
         )
-        self.x_pos_label.grid(row=size - 2, column=size + 1, columnspan=2, rowspan=2)
+        self.x_pos_label.grid(row=size - 2, column=size + 1, columnspan=2, rowspan=2)"""
 
         self.feedback_label = tk.Label(
             self.window, textvariable=self.feedback, font=("Times New Roman", 20)
