@@ -21,7 +21,7 @@ class Highscore:
         Skapar ett fönster med de 10 bäsa tiderna
         """
         self.window = tk.Tk()
-        self.window.geometry("500x1200")
+        #self.window.geometry("500x1200")
         self.highscores = self.get_highscore()
         # Om det finns fler än 10st tider tas de 10 bästa
         if len(self.highscores) >= 10:
@@ -30,9 +30,9 @@ class Highscore:
             amount_scores = len(self.highscores)
         for i in range(amount_scores):
             # label med tiden
-            self.score = tk.Label(self.window, text=f"{self.highscores[i]} sekunder")
+            self.score = tk.Label(self.window, text=f"{i + 1}:a     {self.highscores[i]} sekunder", font=("Times New Roman", 25))
             # position av label
-            self.score.grid(row=i)
+            self.score.grid(row=i, padx=100, pady=10)
 
     def get_highscore(self):
         """
@@ -80,7 +80,7 @@ class Rules:
         self.play.grid(row=2)
         # knapp för att visa highscore
         self.highscore = tk.Button(
-            self.window, text="Highscores", command=self.start_highscore
+            self.window, text="Rekord", command=self.start_highscore
         )
         # position av highscoreknapp
         self.highscore.grid(row=3)
