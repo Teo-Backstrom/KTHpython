@@ -306,73 +306,63 @@ class Gameboard:
                     return False
         return True
 
-    def read_coordinate(self, x, y, feedback_var):
-        approved_coords = False
-
-        try:
-            x = int(x)
-            y = int(y)
-        except:
-            print("Måste vara ett heltal, försök igen22")
-            feedback_var.set("Måste vara ett heltal,\n försök igen")
-        else:
-            if x >= self.size or x < 0 or y >= self.size or y < 0:
-                print(
-                    f"X kordinaten är inte innom gränserna av {self.size} x {self.size} planen"
-                )
-                feedback_var.set(
-                    f"X kordinaten är utanför\n gränserna av {self.size}x{self.size} planen"
-                )
-            else:
-                approved_coords = True
-        if approved_coords:
-            return x, y
-
     def undo(self, x, y, feedback_var):
         """
         funktion för att nollställa en ruta
         """
-
-        if self.turn < 1:
-            print("Finns inga steg att ta bort")
-            feedback_var.set("Finns inga steg att ta bort")
-
-        else:
-            self.turn -= 1
-            self.gameboard[y][x].set("↟")
+        # tar minus ett steg
+        self.turn -= 1
+        self.gameboard[y][x].set("↟")
 
     def update_output(self, x, y, feedback_var):
-        print(x, y)
+        """
+        funktion för att att kalla på alla funktioner så det blir ett spel
+        """
         allowed_input = False
-        # x, y = self.read_coordinate(x, y, feedback_var)
+        # kollar ifall input är godkänt
         allowed_input = self.checksurround(x, y, feedback_var)
+
+        # ifall det är kodkänt så skapas ett troll på rätt position
         if allowed_input:
-            troll = Trolls(x, y)
-            self.gameboard[y][x].set(str(troll))
+            self.gameboard[y][x].set("*")
+            # en steg läggs till i räknaren
             self.turn += 1
             allowed_input = False
-        if self.turn >= self.size:
-            self.root.destroy()
-            Winner(self.time)
 
+        # har koll ifall alla troll är utplaserade
+        if self.turn >= self.size:
+            # sparar tiden
             save_to_file(stopwatch(self.time))
+
+            self.root.destroy()
+            # Startar vinnar skärmen
+            Winner(self.time)
 
 
 class GameApp:
+    """
+    klass som står för det gafiska gränssnittet till spelet
+    """
+
     def __init__(self, size) -> None:
+        """
+        Funkiton som skapar GUI:n och tar in storleken på planen
+        """
         self.window = tk.Tk()
         self.window.geometry(str(300 * size) + "x" + str(200 * size))
+        # StringVar för feedback
         self.feedback = tk.StringVar()
-        self.gameboard = Gameboard(
-            size, self.window
-        )  # Pass the Tkinter root to the Gameboard instance
-        """if gaming != None:
-            self.gameboard = gaming"""
+        # Skapar en instans av Gameboard med rätt storlek och skickar över fönster-roten
+        self.gameboard = Gameboard(size, self.window)
+
+        # Loop för att skapa det kvadratiska spelbrädet av kanppar
         for i in range(size):
             for j in range(size):
+                # En knapp som representarar en låda som kan vara tom eller ett troll
                 self.box = tk.Button(
                     self.window,
                     textvariable=self.gameboard.gameboard[i][j],
+                    # Sätter positionen av knappen som en input för funktionen
                     command=lambda y=i, x=j: self.gameboard.update_output(
                         x, y, self.feedback
                     ),
@@ -380,78 +370,61 @@ class GameApp:
                     height=1,
                     font=("Times New Roman", 50),
                 )
+                # Position av låda
                 self.box.grid(row=i, column=j)
 
-        """self.x_pos = tk.Entry(
-            self.window, font=("Times New Roman", 20), justify="center"
-        )
-        self.x_pos.grid(row=size - 1, column=size + 1, columnspan=2)
-
-        self.ok = tk.Button(
-            self.window,
-            text="OK",
-            command=lambda: self.gameboard.update_output(self.x_pos, self.feedback),
-            font=("Times New Roman", 20),
-        )
-        self.ok.grid(row=size, column=size + 2)
-
-        self.undo_button = tk.Button(
-            self.window,
-            text="UNDO",
-            command=lambda: self.gameboard.undo(self.feedback),
-            font=("Times New Roman", 20),
-        )
-        self.undo_button.grid(row=size, column=size + 1)
-
-        self.x_pos_label = tk.Label(
-            self.window, text="Ange X kordinat", font=("Times New Roman", 20)
-        )
-        self.x_pos_label.grid(row=size - 2, column=size + 1, columnspan=2, rowspan=2)"""
-
+        # feedback text
         self.feedback_label = tk.Label(
             self.window, textvariable=self.feedback, font=("Times New Roman", 20)
         )
+        # Position av feedbacktext
         self.feedback_label.grid(row=size - 3, column=size + 1, columnspan=2, rowspan=2)
         self.window.mainloop()
 
 
 def bruteforce_solve(size):
+    """
+    Funktion för att automatiskt lösa alla spelbärden
+    """
     root = tk.Tk()
+    # Skapar en ny instans av gameboardklassen
     game = Gameboard(size, root)
+    # skapar en tom lista som står för troll positioner för vaje rad
     rows = [0] * size
     allowed_input = False
+    # körs till planen är löst
     while game.turn < size:
+        # kollar om förutbestämd position är tillåten
         allowed_input = game.checksurround(rows[game.turn], tk.StringVar())
+        # Om inte så skapas en ny instans av Gameboard och trollpositionen itterar systematiskt 1 steg
         if not allowed_input:
             game = Gameboard(size, root)
             rows[size - 1] += 1
             while True:
-                kkk = True
+                # ifall positionen är utanför planen så flyttas raden över ett steg och raden under börjar om
+                end_of_row = True
+                # behöver kolla fler gånger ifall en kedjereaktion har börjat
                 for i in range(size):
                     if rows[i] > size - 1:
                         rows[i - 1] += 1
                         rows[i] = 0
-                        kkk = False
-                if kkk:
+                        end_of_row = False
+                if end_of_row:
                     break
 
-        print(rows)
-
-        # troll = Trolls(rows[game.gameboard.turn], game.gameboard.turn)
+        # Ifall positionen är godkänd så sätts trollet ut
         game.gameboard[game.turn][rows[game.turn]].set("*")
+        # Räkaren går ett steg
         game.turn += 1
         allowed_input = False
-    print(
-        "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
-    )
-
+    # Skriver ut den lösta spelplanen grafiskt
     for i in range(size):
         for j in range(size):
             box = tk.Label(
                 root,
                 textvariable=game.gameboard[i][j],
-                width=4,
-                height=2,
+                width=3,
+                height=1,
                 font=("Times New Roman", 50),
             )
             box.grid(row=i, column=j)
@@ -459,17 +432,21 @@ def bruteforce_solve(size):
 
 
 def stopwatch(time_start):
+    """
+    Funktion för att räkna ut och retunera speltiden
+    """
     time_result = time.time() - time_start
-    """mins = time_result // 60
-    sec = time_result % 60
-    print(f"{mins} minuter : {sec} sekunders")
-    return f"{mins} minuter : {sec} sekunders"""
+    # avrundar till 2 decimaler
     time_result = round(time_result, 2)
     return time_result
 
 
 def save_to_file(time):
+    """
+    funktion för att spara ned tiden i en fil
+    """
     times = []
+    # Ifall rekordfilen finns så läggs de gamla rekorden i en lista
     try:
         rekord_file = open("rekord.txt", "r")
         for rekord in rekord_file:
@@ -477,10 +454,16 @@ def save_to_file(time):
         rekord_file.close()
 
     except:
+        # ger återkopping til användaren
         print("Inga gamla rekord")
+
+    # lägger in nya tiden i listan
     times.append(float(time))
+    # Sorterar tiderna i listan
     times.sort()
+    # Öppnar filen för skrivning
     rekord_file = open("rekord.txt", "w")
+    # skriver ned alla tider i filen och stänger den
     for rekord in times:
         rekord_file.write(str(rekord) + "\n")
     rekord_file.close()
