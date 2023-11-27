@@ -2,15 +2,6 @@ import time
 import tkinter as tk
 
 
-class Trolls:
-    def __init__(self, x_pos, y_pos) -> None:
-        self.x_pos = x_pos
-        self.y_pos = y_pos
-
-    def __str__(self) -> str:
-        return "*"
-
-
 class Highscore:
     """
     Klass för att visa de 10 bästa tiderna
@@ -224,7 +215,7 @@ class Get_size:
 
 class Gameboard:
     """
-    Klass som håller har alla spelregler i sig och representera spelplanen logiskt
+    Klass som har alla spelregler i sig och representerar spelplanen logiskt
     """
 
     def __init__(self, size, root) -> None:
@@ -267,23 +258,20 @@ class Gameboard:
         """
         # Om positionen är tagen så nollställs rutan
         if self.gameboard[y][x].get() == "*":
-            print("Är samma")
-            feedback_var.set("Är samma")
+            feedback_var.set("Nollställd")
             self.undo(x, y, feedback_var)
             return False
 
         # Kollar om det redan finns ett troll på samma rad
         if "*" in [self.gameboard[y][i].get() for i in range(self.size)]:
-            print("samma rad")
-            feedback_var.set("samm rad")
+            feedback_var.set("Raden är upptagen")
 
             return False
 
         for i in range(self.size):
             # Kollar om det finns troll på samma kolumn
             if self.gameboard[i][x].get() == "*":
-                print("Samma kolumn")
-                feedback_var.set("Samma kolumn")
+                feedback_var.set("Kolumnen är upptagen")
 
                 return False
 
@@ -291,8 +279,7 @@ class Gameboard:
             # kollar så att den bara kollar innanför planen
             if (x - y + i < self.size) and (x - y + i >= 0):
                 if self.gameboard[i][x - y + i].get() == "*":
-                    print("Diago")
-                    feedback_var.set("Diago")
+                    feedback_var.set("Diagonalen är upptagen")
 
                     return False
 
@@ -300,8 +287,7 @@ class Gameboard:
             # kollar så att den bara kollar innanför planen
             if (x + y - i < self.size) and (x + y - i >= 0):
                 if self.gameboard[i][x + y - i].get() == "*":
-                    print("Diagonal")
-                    feedback_var.set("Diagonal")
+                    feedback_var.set("Diagonalen är upptagen")
 
                     return False
         return True
@@ -325,7 +311,7 @@ class Gameboard:
         # ifall det är kodkänt så skapas ett troll på rätt position
         if allowed_input:
             self.gameboard[y][x].set("*")
-            # en steg läggs till i räknaren
+            # ett steg läggs till i räknaren
             self.turn += 1
             allowed_input = False
 
@@ -395,7 +381,7 @@ def bruteforce_solve(size):
     # körs till planen är löst
     while game.turn < size:
         # kollar om förutbestämd position är tillåten
-        allowed_input = game.checksurround(rows[game.turn], tk.StringVar())
+        allowed_input = game.checksurround(rows[game.turn],game.turn, tk.StringVar())
         # Om inte så skapas en ny instans av Gameboard och trollpositionen itterar systematiskt 1 steg
         if not allowed_input:
             game = Gameboard(size, root)
