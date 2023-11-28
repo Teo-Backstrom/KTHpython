@@ -12,7 +12,7 @@ class Highscore:
         Skapar ett fönster med de 10 bäsa tiderna
         """
         self.window = tk.Tk()
-        #self.window.geometry("500x1200")
+        
         self.highscores = self.get_highscore()
         # Om det finns fler än 10st tider tas de 10 bästa
         if len(self.highscores) >= 10:
@@ -20,14 +20,20 @@ class Highscore:
         else:
             amount_scores = len(self.highscores)
         for i in range(amount_scores):
-            # label med tiden
+            # etikett med tiden
             self.score = tk.Label(self.window, text=f"{i + 1}:a     {self.highscores[i]} sekunder", font=("Times New Roman", 25))
-            # position av label
+            # position av etikett
             self.score.grid(row=i, padx=100, pady=10)
+
+        #knapp för att stänga ned fönstret och öppna huvudmenyn
+        self.restart = tk.Button(self.window, text="Huvudmeny", command= lambda: [self.window.destroy(), Rules()], font=("Times New Roman", 20))
+        #position av knapp
+        self.restart.grid(row=11, pady=20)
 
     def get_highscore(self):
         """
         funktion för att ta in tider från highscorefilen och spara i en lista som retuneras
+        retunerar: (List) times
         """
         times = []
         rekord_file = open("rekord.txt", "r")
@@ -35,6 +41,8 @@ class Highscore:
             times.append(float(rekord))
         rekord_file.close()
         return times
+    
+    
 
 
 class Rules:
@@ -48,7 +56,7 @@ class Rules:
         """
         self.window = tk.Tk()
         self.window.geometry("1200x500")
-        # label som visar reglerna
+        # etikett som visar reglerna
         self.rules_text = tk.Label(
             self.window,
             text=(
@@ -66,7 +74,7 @@ class Rules:
         # position av reglerna
         self.rules_text.grid(row=1, padx=200)
         # knapp för att starta spelet
-        self.play = tk.Button(self.window, text="Play", command=self.start_game)
+        self.play = tk.Button(self.window, text="Spela", command=self.start_game)
         # position av startknapp
         self.play.grid(row=2)
         # knapp för att visa highscore
@@ -77,7 +85,7 @@ class Rules:
         self.highscore.grid(row=3)
         # StringVar för feedvbacktext
         self.feedback = tk.StringVar()
-        # label med feedbacktext
+        # etikett med feedbacktext
         self.feedback_label = tk.Label(
             self.window, textvariable=self.feedback, font=("Times New Roman", 30)
         )
@@ -116,9 +124,10 @@ class Winner:
         """
         Funktion för att visa användaren sin slutgiltiga tid,
         samt en knapp för att börja om
+        Tar in time_start(Time) vid början av spelet så skillnaden kan räknas ut
         """
         self.window = tk.Tk()
-        self.window.geometry("1200x500")
+        
 
         # vinnar text
         self.win_text = tk.Label(
@@ -127,22 +136,22 @@ class Winner:
             font=("Times New Roman", 30),
         )
         # position av text
-        self.win_text.grid(row=1)
+        self.win_text.grid(row=1, pady=10)
 
-        # label med vinnar tid
+        # etikett med vinnar tid
         self.time_label = tk.Label(
             self.window,
-            text=(stopwatch(time_start)),
+            text=(f"Din tid: {stopwatch(time_start)} sekunder"),
             font=("Times New Roman", 30),
         )
         # position av tid
-        self.time_label.grid(row=2)
+        self.time_label.grid(row=2, padx= 30)
         # omstart knapp
         self.restart_button = tk.Button(
-            self.window, text="Restart", command=self.restart
+            self.window, text="Starta om", command=self.restart
         )
         # positon av knapp
-        self.restart_button.grid(row=3)
+        self.restart_button.grid(row=3, pady=40)
         self.window.mainloop()
 
     def restart(self):
@@ -172,14 +181,15 @@ class Get_size:
         # position av feedbacktext
         self.feedback_label.grid(row=1, column=1, pady=30)
         # knapp för att strata spelet
+        # Använder lambda för att kunna skicka med parametrar till funktionen https://pythonprogramming.net/passing-functions-parameters-tkinter-using-lambda/
         self.play = tk.Button(
-            self.window, text="Play", command=lambda: self.get_size(True)
+            self.window, text="Spela", command=lambda: self.get_size(True)
         )
         # position av startknapp
         self.play.grid(row=3, column=1)
         # knapp för att starta autosolver:n
         self.brute = tk.Button(
-            self.window, text="Solve", command=lambda: self.get_size(False)
+            self.window, text="Auto-Lös", command=lambda: self.get_size(False)
         )
         # position av solver kanpp
         self.brute.grid(row=4, column=1)
@@ -190,6 +200,7 @@ class Get_size:
         """
         funktion för att kolla att inmatingen är korrekt samt om användaren vill låta datorn lösa boredet
         eller om hen vill spela
+        Input: (bool) play: Står för om spelaren vill spela eller inte
         """
         # kollar att det är en int
         try:
@@ -200,7 +211,7 @@ class Get_size:
             # kollar att planen är innom gränserna för vad som är möjligt grafiskt
             if size < 4:
                 self.feedback_var.set("Planen måste minst vara 4x4")
-            elif size > 8:
+            elif size > 10:
                 self.feedback_var.set("Planen får inte plats, updatering kommande")
             else:
                 self.window.destroy()
@@ -221,21 +232,22 @@ class Gameboard:
     def __init__(self, size, root) -> None:
         """
         funktion som tar in storlek på planen och fönster roten från en annan klass
+        och initserar en tom spelplan
         """
         # startar tidtagning
         self.time = time.time()
 
         # Tillvällig
-        A = []
+        empty_gameboard = []
         # Loop för att skapa en tom spelplan
         for i in range(size):
             x = []
             for j in range(size):
                 entity = tk.StringVar(value="↟")
                 x.append(entity)
-            A.append(x)
+            empty_gameboard.append(x)
         # sparar planen i ett klass atribut
-        self.gameboard = A
+        self.gameboard = empty_gameboard
         self.size = size
         # sätter spelrundan till 0
         self.turn = 0
@@ -255,11 +267,16 @@ class Gameboard:
         Funkiton för att kolla att val av positon är giltig,
         om inte så för användaren feedback
         retunerar True ifall det är godkänt
+
+        Input: (int) x: x position
+                (int) y: y position
+                (StringVar) feedback_var: text för feedback till användaren
+        
         """
         # Om positionen är tagen så nollställs rutan
         if self.gameboard[y][x].get() == "*":
             feedback_var.set("Nollställd")
-            self.undo(x, y, feedback_var)
+            self.undo(x, y)
             return False
 
         # Kollar om det redan finns ett troll på samma rad
@@ -292,9 +309,12 @@ class Gameboard:
                     return False
         return True
 
-    def undo(self, x, y, feedback_var):
+    def undo(self, x, y):
         """
         funktion för att nollställa en ruta
+
+        Input: (int) x: x-position
+                (int) y: y-position
         """
         # tar minus ett steg
         self.turn -= 1
@@ -303,6 +323,10 @@ class Gameboard:
     def update_output(self, x, y, feedback_var):
         """
         funktion för att att kalla på alla funktioner så det blir ett spel
+
+        Input: (int) x: x position
+                (int) y: y position
+                (StringVar) feedback_var: feedback text till användaren
         """
         allowed_input = False
         # kollar ifall input är godkänt
@@ -332,10 +356,10 @@ class GameApp:
 
     def __init__(self, size) -> None:
         """
-        Funkiton som skapar GUI:n och tar in storleken på planen
+        Funkiton som skapar GUI:n och tar in storleken på planen (size, int)
         """
         self.window = tk.Tk()
-        self.window.geometry(str(300 * size) + "x" + str(200 * size))
+        self.window.geometry(str(250 * size) + "x" + str(150 * size))
         # StringVar för feedback
         self.feedback = tk.StringVar()
         # Skapar en instans av Gameboard med rätt storlek och skickar över fönster-roten
@@ -364,17 +388,22 @@ class GameApp:
             self.window, textvariable=self.feedback, font=("Times New Roman", 20)
         )
         # Position av feedbacktext
-        self.feedback_label.grid(row=size - 3, column=size + 1, columnspan=2, rowspan=2)
+        self.feedback_label.grid(row = size - 3, column=size, rowspan=4, padx=10)
+
+        self.instructions = tk.Label(self.window, text= "Klicka på ↟ för att plasera ut troll\nKlicka på * för att ångra val", font=("Times New Roman", 20))
+        self.instructions.grid(row=1, column= size, padx= 20)
         self.window.mainloop()
 
 
 def bruteforce_solve(size):
     """
     Funktion för att automatiskt lösa alla spelbärden
+    
+    Input: (int) size: Storleken på planen
     """
-    root = tk.Tk()
+    window = tk.Tk()
     # Skapar en ny instans av gameboardklassen
-    game = Gameboard(size, root)
+    game = Gameboard(size, window)
     # skapar en tom lista som står för troll positioner för vaje rad
     rows = [0] * size
     allowed_input = False
@@ -384,7 +413,7 @@ def bruteforce_solve(size):
         allowed_input = game.checksurround(rows[game.turn],game.turn, tk.StringVar())
         # Om inte så skapas en ny instans av Gameboard och trollpositionen itterar systematiskt 1 steg
         if not allowed_input:
-            game = Gameboard(size, root)
+            game = Gameboard(size, window)
             rows[size - 1] += 1
             while True:
                 # ifall positionen är utanför planen så flyttas raden över ett steg och raden under börjar om
@@ -407,19 +436,24 @@ def bruteforce_solve(size):
     for i in range(size):
         for j in range(size):
             box = tk.Label(
-                root,
+                window,
                 textvariable=game.gameboard[i][j],
                 width=3,
                 height=1,
                 font=("Times New Roman", 50),
             )
             box.grid(row=i, column=j)
-    root.mainloop()
+    restart = tk.Button(window, text="Huvudmeny", command= lambda: [window.destroy(), Rules()], font=("Times New Roman", 20))
+    restart.grid(row= size + 1,columnspan=size, pady=20)
+
+    window.mainloop()
 
 
 def stopwatch(time_start):
     """
     Funktion för att räkna ut och retunera speltiden
+
+    Input: (Time) time_start: starttiden av spelet
     """
     time_result = time.time() - time_start
     # avrundar till 2 decimaler
@@ -430,6 +464,8 @@ def stopwatch(time_start):
 def save_to_file(time):
     """
     funktion för att spara ned tiden i en fil
+
+    Input: (float) time: speltiden
     """
     times = []
     # Ifall rekordfilen finns så läggs de gamla rekorden i en lista
