@@ -2,6 +2,7 @@ import time
 import tkinter as tk
 
 
+# Teo Bäckström CMAST1
 class Highscore:
     """
     Klass för att visa de 10 bästa tiderna
@@ -12,7 +13,7 @@ class Highscore:
         Skapar ett fönster med de 10 bäsa tiderna
         """
         self.window = tk.Tk()
-        
+
         self.highscores = self.get_highscore()
         # Om det finns fler än 10st tider tas de 10 bästa
         if len(self.highscores) >= 10:
@@ -21,13 +22,22 @@ class Highscore:
             amount_scores = len(self.highscores)
         for i in range(amount_scores):
             # etikett med tiden
-            self.score = tk.Label(self.window, text=f"{i + 1}:a     {self.highscores[i]} sekunder", font=("Times New Roman", 25))
+            self.score = tk.Label(
+                self.window,
+                text=f"{i + 1}:a     {self.highscores[i]} sekunder",
+                font=("Times New Roman", 25),
+            )
             # position av etikett
             self.score.grid(row=i, padx=100, pady=10)
 
-        #knapp för att stänga ned fönstret och öppna huvudmenyn
-        self.restart = tk.Button(self.window, text="Huvudmeny", command= lambda: [self.window.destroy(), Rules()], font=("Times New Roman", 20))
-        #position av knapp
+        # knapp för att stänga ned fönstret och öppna huvudmenyn
+        self.restart = tk.Button(
+            self.window,
+            text="Huvudmeny",
+            command=lambda: [self.window.destroy(), Rules()],
+            font=("Times New Roman", 20),
+        )
+        # position av knapp
         self.restart.grid(row=11, pady=20)
 
     def get_highscore(self):
@@ -41,8 +51,6 @@ class Highscore:
             times.append(float(rekord))
         rekord_file.close()
         return times
-    
-    
 
 
 class Rules:
@@ -127,7 +135,6 @@ class Winner:
         Tar in time_start(Time) vid början av spelet så skillnaden kan räknas ut
         """
         self.window = tk.Tk()
-        
 
         # vinnar text
         self.win_text = tk.Label(
@@ -145,7 +152,7 @@ class Winner:
             font=("Times New Roman", 30),
         )
         # position av tid
-        self.time_label.grid(row=2, padx= 30)
+        self.time_label.grid(row=2, padx=30)
         # omstart knapp
         self.restart_button = tk.Button(
             self.window, text="Starta om", command=self.restart
@@ -271,7 +278,7 @@ class Gameboard:
         Input: (int) x: x position
                 (int) y: y position
                 (StringVar) feedback_var: text för feedback till användaren
-        
+
         """
         # Om positionen är tagen så nollställs rutan
         if self.gameboard[y][x].get() == "*":
@@ -388,17 +395,21 @@ class GameApp:
             self.window, textvariable=self.feedback, font=("Times New Roman", 20)
         )
         # Position av feedbacktext
-        self.feedback_label.grid(row = size - 3, column=size, rowspan=4, padx=10)
+        self.feedback_label.grid(row=size - 3, column=size, rowspan=4, padx=10)
 
-        self.instructions = tk.Label(self.window, text= "Klicka på ↟ för att plasera ut troll\nKlicka på * för att ångra val", font=("Times New Roman", 20))
-        self.instructions.grid(row=1, column= size, padx= 20)
+        self.instructions = tk.Label(
+            self.window,
+            text="Klicka på ↟ för att plasera ut troll\nKlicka på * för att ångra val",
+            font=("Times New Roman", 20),
+        )
+        self.instructions.grid(row=1, column=size, padx=20)
         self.window.mainloop()
 
 
 def bruteforce_solve(size):
     """
     Funktion för att automatiskt lösa alla spelbärden
-    
+
     Input: (int) size: Storleken på planen
     """
     window = tk.Tk()
@@ -410,7 +421,7 @@ def bruteforce_solve(size):
     # körs till planen är löst
     while game.turn < size:
         # kollar om förutbestämd position är tillåten
-        allowed_input = game.checksurround(rows[game.turn],game.turn, tk.StringVar())
+        allowed_input = game.checksurround(rows[game.turn], game.turn, tk.StringVar())
         # Om inte så skapas en ny instans av Gameboard och trollpositionen itterar systematiskt 1 steg
         if not allowed_input:
             game = Gameboard(size, window)
@@ -443,8 +454,13 @@ def bruteforce_solve(size):
                 font=("Times New Roman", 50),
             )
             box.grid(row=i, column=j)
-    restart = tk.Button(window, text="Huvudmeny", command= lambda: [window.destroy(), Rules()], font=("Times New Roman", 20))
-    restart.grid(row= size + 1,columnspan=size, pady=20)
+    restart = tk.Button(
+        window,
+        text="Huvudmeny",
+        command=lambda: [window.destroy(), Rules()],
+        font=("Times New Roman", 20),
+    )
+    restart.grid(row=size + 1, columnspan=size, pady=20)
 
     window.mainloop()
 
