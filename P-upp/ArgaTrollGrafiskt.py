@@ -3,6 +3,7 @@ import tkinter as tk
 
 
 # Teo Bäckström CMAST1
+# P uppgift Arga-troll
 class Highscore:
     """
     Klass för att visa de 10 bästa tiderna
@@ -69,8 +70,8 @@ class Rules:
             self.window,
             text=(
                 "Som vi alla vet så finns det många troll som bor i skogen och vissa av dessa troll\n"
-                + "kan vara ganska arga. Det är därför viktigt att trollen inte kan se n˚agra andra arga troll för då böjar de bråka.\n"
-                + " Detta är inte ett lika stort problem som man skulle kunna tro då troll är ganska dumma. De är väldigt bundna till naturen\n"
+                + "kan vara ganska arga. Det är därför viktigt att trollen inte kan se nåagra andra arga troll för då böjar de bråka.\n"
+                + "Detta är inte ett lika stort problem som man skulle kunna tro då troll är ganska dumma. De är väldigt bundna till naturen\n"
                 + "och tittar bara i de fyra väderstrecken samt diagonalerna mellan väderstrecken, sydöst,sydväst, osv\n"
                 + "Reglerna för spelet är ganska enkla. Det ska finnas:\n"
                 + "• Ett troll per rad.\n"
@@ -178,7 +179,7 @@ class Get_size:
         self.window = tk.Tk()
         self.window.geometry("400x200")
         # StringVar för feedback
-        self.feedback_var = tk.StringVar(value="Ange storlek på spelplanen")
+        self.feedback_var = tk.StringVar(value="Ange sido-längd på spelplanen")
         # Inmating för användaren
         self.size_input = tk.Entry(self.window, font=("Times New Roman", 20))
         # positon för inmating
@@ -217,7 +218,7 @@ class Get_size:
         else:
             # kollar att planen är innom gränserna för vad som är möjligt grafiskt
             if size < 4:
-                self.feedback_var.set("Planen måste minst vara 4x4")
+                self.feedback_var.set("Planen måste minst vara 4 lång")
             elif size > 10:
                 self.feedback_var.set("Planen får inte plats, updatering kommande")
             else:
