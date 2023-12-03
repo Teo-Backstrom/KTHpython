@@ -86,11 +86,11 @@ class Rules:
         self.play = tk.Button(self.window, text="Spela", command=self.start_game)
         # position av startknapp
         self.play.grid(row=2)
-        # knapp för att visa highscore
+        # knapp för att visa rekord
         self.highscore = tk.Button(
             self.window, text="Rekord", command=self.start_highscore
         )
-        # position av highscoreknapp
+        # position av rekordknappen
         self.highscore.grid(row=3)
         # StringVar för feedvbacktext
         self.feedback = tk.StringVar()
@@ -195,7 +195,7 @@ class Get_size:
         )
         # position av startknapp
         self.play.grid(row=3, column=1)
-        # knapp för att starta autosolver:n
+        # knapp för att starta autolösaren
         self.brute = tk.Button(
             self.window, text="Auto-Lös", command=lambda: self.get_size(False)
         )
