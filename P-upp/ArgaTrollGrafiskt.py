@@ -9,13 +9,13 @@ class Highscore:
     Klass för att visa de 10 bästa tiderna
     """
 
-    def __init__(self) -> None:
+    def __init__(self, size) -> None:
         """
         Skapar ett fönster med de 10 bäsa tiderna
         """
         self.window = tk.Tk()
-
-        self.highscores = self.get_highscore()
+        #lägger de 10 bästa tiderna från rätt planstorlek i en lista
+        self.highscores = self.get_highscore(size)
         # Om det finns fler än 10st tider tas de 10 bästa
         if len(self.highscores) >= 10:
             amount_scores = 10
@@ -41,13 +41,13 @@ class Highscore:
         # position av knapp
         self.restart.grid(row=11, pady=20)
 
-    def get_highscore(self):
+    def get_highscore(self,size):
         """
-        funktion för att ta in tider från highscorefilen och spara i en lista som retuneras
+        funktion för att ta in tider från rätt highscorefil och spara i en lista som retuneras
         retunerar: (List) times
         """
         times = []
-        rekord_file = open("rekord.txt", "r")
+        rekord_file = open(f"{size}rekord.txt", "r")
         for rekord in rekord_file:
             times.append(float(rekord))
         rekord_file.close()
@@ -83,23 +83,10 @@ class Rules:
         # position av reglerna
         self.rules_text.grid(row=1, padx=200)
         # knapp för att starta spelet
-        self.play = tk.Button(self.window, text="Spela", command=self.start_game)
+        self.play = tk.Button(self.window, text="Nästa", command=self.start_game)
         # position av startknapp
         self.play.grid(row=2)
-        # knapp för att visa rekord
-        self.highscore = tk.Button(
-            self.window, text="Rekord", command=self.start_highscore
-        )
-        # position av rekordknappen
-        self.highscore.grid(row=3)
-        # StringVar för feedvbacktext
-        self.feedback = tk.StringVar()
-        # etikett med feedbacktext
-        self.feedback_label = tk.Label(
-            self.window, textvariable=self.feedback, font=("Times New Roman", 30)
-        )
-        # position av feedbacktext
-        self.feedback_label.grid(row=4)
+        
         self.window.mainloop()
 
     def start_game(self):
@@ -108,20 +95,6 @@ class Rules:
         """
         self.window.destroy()
         Get_size()
-
-    def start_highscore(self):
-        """
-        Funktion som kollar att highscorefilen finns,
-        om filen finns så visas highscoresen,
-        om filen saknas så får användaren återkopping
-        """
-        try:
-            open("rekord.txt", "r")
-        except:
-            self.feedback.set("Inga higscores finns")
-        else:
-            self.window.destroy()
-            Highscore()
 
 
 class Winner:
@@ -191,20 +164,23 @@ class Get_size:
         # knapp för att strata spelet
         # Använder lambda för att kunna skicka med parametrar till funktionen https://pythonprogramming.net/passing-functions-parameters-tkinter-using-lambda/
         self.play = tk.Button(
-            self.window, text="Spela", command=lambda: self.get_size(True)
+            self.window, text="Spela", command=lambda: self.get_size(1)
         )
         # position av startknapp
         self.play.grid(row=3, column=1)
         # knapp för att starta autolösaren
         self.brute = tk.Button(
-            self.window, text="Auto-Lös", command=lambda: self.get_size(False)
+            self.window, text="Auto-Lös", command=lambda: self.get_size(2)
         )
         # position av solver kanpp
         self.brute.grid(row=4, column=1)
+        self.highscore = tk.Button(self.window, text="Rekord", command=lambda: self.get_size(3))
+        self.highscore.grid(row=5, column=1)
+        
 
         self.window.mainloop()
 
-    def get_size(self, play):
+    def get_size(self, choice):
         """
         funktion för att kolla att inmatingen är korrekt samt om användaren vill låta datorn lösa boredet
         eller om hen vill spela
@@ -222,15 +198,23 @@ class Get_size:
             elif size > 10:
                 self.feedback_var.set("Planen får inte plats, updatering kommande")
             else:
-                self.window.destroy()
-
                 # om användaren tryckt på playknappen så startas spelet
                 # om användren tryck på solve knappen så löses spelet
-                if play:
+                if choice == 1:
+                    self.window.destroy()
                     GameApp(size)
-                else:
+                elif choice == 2:
+                    self.window.destroy()
                     bruteforce_solve(size)
-
+                else: 
+                    #kollar om filen finns för rätt rekord
+                    try:
+                        open(f"{size}rekord.txt", "r")
+                    except:
+                        self.feedback_var.set("Inga rekord finns")
+                    else:
+                        self.window.destroy()
+                        Highscore(size)
 
 class Gameboard:
     """
@@ -350,7 +334,7 @@ class Gameboard:
         # har koll ifall alla troll är utplaserade
         if self.turn >= self.size:
             # sparar tiden
-            save_to_file(stopwatch(self.time))
+            save_to_file(stopwatch(self.time),self.size)
 
             self.root.destroy()
             # Startar vinnar skärmen
@@ -478,16 +462,17 @@ def stopwatch(time_start):
     return time_result
 
 
-def save_to_file(time):
+def save_to_file(time, size):
     """
     funktion för att spara ned tiden i en fil
 
     Input: (float) time: speltiden
+            (int) size: planstorlek
     """
     times = []
     # Ifall rekordfilen finns så läggs de gamla rekorden i en lista
     try:
-        rekord_file = open("rekord.txt", "r")
+        rekord_file = open(f"{size}rekord.txt", "r")
         for rekord in rekord_file:
             times.append(float(rekord))
         rekord_file.close()
@@ -500,8 +485,8 @@ def save_to_file(time):
     times.append(float(time))
     # Sorterar tiderna i listan
     times.sort()
-    # Öppnar filen för skrivning
-    rekord_file = open("rekord.txt", "w")
+    # Öppnar rätt fil för skrivning
+    rekord_file = open(f"{size}rekord.txt", "w")
     # skriver ned alla tider i filen och stänger den
     for rekord in times:
         rekord_file.write(str(rekord) + "\n")
