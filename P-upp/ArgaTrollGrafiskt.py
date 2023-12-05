@@ -14,7 +14,7 @@ class Highscore:
         Skapar ett fönster med de 10 bäsa tiderna
         """
         self.window = tk.Tk()
-        #lägger de 10 bästa tiderna från rätt planstorlek i en lista
+        # lägger de 10 bästa tiderna från rätt planstorlek i en lista
         self.highscores = self.get_highscore(size)
         # Om det finns fler än 10st tider tas de 10 bästa
         if len(self.highscores) >= 10:
@@ -41,7 +41,7 @@ class Highscore:
         # position av knapp
         self.restart.grid(row=11, pady=20)
 
-    def get_highscore(self,size):
+    def get_highscore(self, size):
         """
         funktion för att ta in tider från rätt highscorefil och spara i en lista som retuneras
         retunerar: (List) times
@@ -86,7 +86,7 @@ class Rules:
         self.play = tk.Button(self.window, text="Nästa", command=self.start_game)
         # position av startknapp
         self.play.grid(row=2)
-        
+
         self.window.mainloop()
 
     def start_game(self):
@@ -161,7 +161,7 @@ class Get_size:
         self.feedback_label = tk.Label(self.window, textvariable=self.feedback_var)
         # position av feedbacktext
         self.feedback_label.grid(row=1, column=1, pady=30)
-        # knapp för att strata spelet
+        # knapp för att starta spelet
         # Använder lambda för att kunna skicka med parametrar till funktionen https://pythonprogramming.net/passing-functions-parameters-tkinter-using-lambda/
         self.play = tk.Button(
             self.window, text="Spela", command=lambda: self.get_size(1)
@@ -174,9 +174,10 @@ class Get_size:
         )
         # position av solver kanpp
         self.brute.grid(row=4, column=1)
-        self.highscore = tk.Button(self.window, text="Rekord", command=lambda: self.get_size(3))
+        self.highscore = tk.Button(
+            self.window, text="Rekord", command=lambda: self.get_size(3)
+        )
         self.highscore.grid(row=5, column=1)
-        
 
         self.window.mainloop()
 
@@ -190,7 +191,7 @@ class Get_size:
         try:
             size = int(self.size_input.get())
         except:
-            self.feedback_var.set("Värdet måste vara en int")
+            self.feedback_var.set("Värdet måste vara ett heltal")
         else:
             # kollar att planen är innom gränserna för vad som är möjligt grafiskt
             if size < 4:
@@ -206,8 +207,8 @@ class Get_size:
                 elif choice == 2:
                     self.window.destroy()
                     bruteforce_solve(size)
-                else: 
-                    #kollar om filen finns för rätt rekord
+                else:
+                    # kollar om filen finns för rätt rekord
                     try:
                         open(f"{size}rekord.txt", "r")
                     except:
@@ -215,6 +216,7 @@ class Get_size:
                     else:
                         self.window.destroy()
                         Highscore(size)
+
 
 class Gameboard:
     """
@@ -334,7 +336,7 @@ class Gameboard:
         # har koll ifall alla troll är utplaserade
         if self.turn >= self.size:
             # sparar tiden
-            save_to_file(stopwatch(self.time),self.size)
+            save_to_file(stopwatch(self.time), self.size)
 
             self.root.destroy()
             # Startar vinnar skärmen
